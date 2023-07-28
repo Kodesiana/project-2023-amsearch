@@ -1,0 +1,53 @@
+<nav class="navbar" role="navigation" aria-label="main navigation">
+    <div class="navbar-brand">
+        <a class="navbar-item" href="/">
+            <img src="/static/logo.png" height="28">
+        </a>
+
+        <a role="button" class="navbar-burger" aria-label="menu" aria-expanded="false" data-target="navbarBasicExample">
+            <span aria-hidden="true"></span>
+            <span aria-hidden="true"></span>
+            <span aria-hidden="true"></span>
+        </a>
+    </div>
+
+    <div id="navbarBasicExample" class="navbar-menu">
+        <div class="navbar-end">
+            {% if current_user.is_authenticated %}
+            <a class="navbar-item" href="{{ url_for('admin.list') }}">
+                Dataset
+            </a>
+            {% endif %}
+
+            <a class="navbar-item" href="{{ url_for('search.search', engine='bert') }}">
+                Mesin Pencari BERT
+            </a>
+
+            <a class="navbar-item" href="{{ url_for('search.search', engine='tfidf') }}">
+                Mesin Pencari TF-IDF
+            </a>
+
+            <a class="navbar-item" href="{{ url_for('search.search', engine='google') }}">
+                Mesin Pencari Google
+            </a>
+
+            <a class="navbar-item" href="{{ url_for('search.about') }}">
+                Tentang Aplikasi Ini
+            </a>
+
+            <div class="navbar-item">
+                <div class="buttons">
+                    {% if current_user.is_authenticated %}
+                    <a class="button is-primary" href="{{ url_for('auth.logout') }}">
+                        Logout
+                    </a>
+                    {% else %}
+                    <a class="button is-primary" href="{{ url_for('auth.login') }}">
+                        Login
+                    </a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</nav>

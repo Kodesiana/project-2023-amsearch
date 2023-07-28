@@ -1,0 +1,72 @@
+{% extends "layouts/base.html" %}
+
+{% block content %}
+<section class="hero is-fullheight is-light">
+    <div class="hero-head">
+        {% include "components/navbar.html" %}
+    </div>
+    <div class="hero-body p-b-30">
+        <div class="container">
+            <!-- Header -->
+            <div class="columns is-centered">
+                <div class="column is-7">
+                    <div class="is-flex is-justify-content-space-between">
+                        <h4 class="is-size-4 has-text-weight-bold">Hasil Pencarian</h4>
+                        <h5 class="is-size-5">{{ engine_desc }}</h5>
+                    </div>
+                </div>
+            </div>
+            <!-- Search -->
+            <div class="columns is-centered">
+                <div class="column is-7">
+                    {% with messages = get_flashed_messages() %}
+                    {% if messages %}
+                    <div class="notification is-warning">
+                        {% for message in messages %}
+                        {{ message }}
+                        {% endfor %}
+                    </div>
+                    {% else %}
+                    <form action="{{ url_for('search.search') }}">
+                        <input type="submit" hidden />
+                        <input type="hidden" value="{{ engine }}" name="engine" />
+                        <div class="field has-addons has-shadow-field">
+                            <input type="text" class="input is-large" name="q" value="{{ keyword }}">
+                        </div>
+                    </form>
+                    <p class="mt-2 mb-4">Ditemukan {{ '{:,}'.format(results.total) }} dokumen dengan kata pencarian "{{ keyword }}". Lama eksekusi {{ execution_time }} detik.</p>
+                    {% endif %}
+                    {% endwith %}
+                </div>
+            </div>
+            <!-- Results -->
+            <div class="columns is-centered">
+                <div class="column is-7">
+                    {% for result in results.items %}
+                    <div class="card mb-4">
+                        <div class="card-content">
+                            <div class="content">
+                                <a href="{{ result.url }}"><h4>{{ result.title }}</h4></a>
+                                {{ result.excerpt }}
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+
+                    <div class="is-flex is-justify-content-space-between">
+                        {% if results.has_prev %}
+                        <a class="button" href="{{ url_for('search.search', engine=engine, q=keyword, page=results.page-1 ) }}">Prev</a>
+                        {% else %}
+                        <div class="is-invisible"></div>
+                        {% endif %}
+
+                        {% if results.has_next %}
+                        <a class="button" href="{{ url_for('search.search', engine=engine, q=keyword, page=results.page+1 ) }}">Next</a>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

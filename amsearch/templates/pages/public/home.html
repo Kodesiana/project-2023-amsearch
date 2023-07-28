@@ -1,0 +1,36 @@
+{% extends "layouts/base.html" %}
+
+{% block content %}
+<section class="hero is-fullheight is-light">
+    <div class="hero-head">
+        {% include "components/navbar.html" %}
+    </div>
+    <div class="hero-body p-b-30">
+        <div class="container">
+            <div class="columns is-centered mb-6">
+                <img src="/static/logo.png">
+            </div>
+            <form action="{{ url_for('search.search') }}">
+                <div class="columns is-centered">
+                    <div class="column is-7">
+                        <div class="field has-addons has-shadow-field">
+                            <input type="submit" hidden />
+                            <input type="hidden" value="bert" name="engine" />
+                            <input type="text" name="q" class="input is-large is-rounded is-rounded" placeholder="Masukan kata yang akan dicari...">
+                        </div>
+                    </div>
+                </div>
+                <div class="columns is-centered">
+                    <div class="column is-1">
+                        <div class="field has-addons has-shadow-field">
+                            <button type="button" class="button is-large is-primary">
+                                <span class="has-text-weight-semibold">Cari</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</section>
+{% endblock %}

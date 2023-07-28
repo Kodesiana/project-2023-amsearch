@@ -1,0 +1,110 @@
+{% extends "layouts/base.html" %}
+
+{% block content %}
+<section class="hero is-fullheight is-light">
+    <div class="hero-head">
+        {% include "components/navbar.html" %}
+    </div>
+    <div class="hero-body p-b-30">
+        <div class="container">
+            <!-- Header -->
+            <div class="is-flex is-justify-content-space-between mb-4">
+                <h4 class="is-size-4 has-text-weight-bold">Dataset</h4>
+                <a class="button is-primary" href="{{ url_for('admin.create') }}">
+                    <span class="icon">
+                        <i class="fa fa-plus"></i>
+                    </span>
+                    <span>Tambah</span>
+                </a>
+            </div>
+            <!-- Dataset -->
+            <table class="table is-striped is-hoverable is-fullwidth">
+                <thead>
+                    <tr>
+                        <th>No</th>
+                        <th>Judul</th>
+                        <th>Isi</th>
+                        <th>Jumlah Token</th>
+                        <th>Aksi</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for item in pagination.items %}
+                    <tr>
+                        <td>{{ loop.index * pagination.page }}</td>
+                        <td>{{ item.title }}</td>
+                        <td>{{ item.content }}</td>
+                        <td>{{ item.token_count }}</td>
+                        <td>
+                            <a class="button" href="{{ url_for('admin.update', id=item.id) }}">
+                                <span class="icon">
+                                    <i class="fa fa-pencil"></i>
+                                </span>
+                            </a>
+                            <div class="button is-danger delete-button" data-id="{{ item.id }}">
+                                <span class="icon">
+                                    <i class="fa fa-trash"></i>
+                                </span>
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            <!-- Pager -->
+            <nav class="pagination" role="navigation" aria-label="pagination">
+                {% if pagination.has_prev %}
+                <a class="pagination-previous" href="{{ url_for('admin.list', page=pagination.prev_num, per_page=pagination.per_page) }}">Previous</a>
+                {% endif %}
+                {% if pagination.has_next %}
+                <a class="pagination-next" href="{{ url_for('admin.list', page=pagination.next_num, per_page=pagination.per_page) }}">Next page</a>
+                {% endif %}
+                <ul class="pagination-list">
+                    {% for page in pagination.iter_pages() %}
+                    {% if page %}
+                    {% if page != pagination.page %}
+                    <li>
+                        <a class="pagination-link" href="{{ url_for('admin.list', page=page, per_page=pagination.per_page) }}">{{ page }}</a>
+                    </li>
+                    {% else %}
+                    <li>
+                        <a class="pagination-link is-current" aria-current="page">{{ page }}</a>
+                    </li>
+                    {% endif %}
+                    {% else %}
+                    <li>
+                        <span class="pagination-ellipsis">&hellip;</span>
+                    </li>
+                    {% endif %}
+                    {% endfor %}
+                </ul>
+            </nav>
+        </div>
+    </div>
+</section>
+
+<script>
+    window.onload = function () {
+        deleteButtons = document.querySelectorAll('.delete-button')
+        deleteButtons.forEach(button => {
+            const id = button.dataset.id
+            button.addEventListener('click', function deleteItem(e) {
+                console.log(id)
+                Swal.fire({
+                    title: 'Hapus data',
+                    text: 'Anda yakin menghapus data?',
+                    icon: 'question',
+                    showCancelButton: true,
+                    confirmButtonText: 'OK'
+                }).then(result => {
+                    if (!result.isConfirmed) {
+                        return
+                    }
+
+                    window.location.href = `/admin/remove/${id}`
+                });
+            })
+        })
+    }    
+</script>
+{% endblock %}
