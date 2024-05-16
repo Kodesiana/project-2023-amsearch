@@ -18,8 +18,8 @@ def login():
     password = request.form.get('password')
 
     # find the user by email
-    user = db.session.execute(
-        db.select(User).where(User.username == username)).scalar_one()
+    query = db.select(User).where(User.username == username)
+    user = db.session.execute(query).scalar_one_or_none()
 
     # verify password
     if not user or not check_password_hash(user.hashed_password, password):

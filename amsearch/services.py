@@ -95,8 +95,8 @@ class SearchService:
 
         # run query
         start_time = time.time()
-        query = db.select(Document).order_by(
-            Document.embedding_tfidf.cosine_distance(embedding))
+        query = db.select(Document) \
+            .order_by(Document.embedding_tfidf.cosine_distance(embedding))
         paged_rows = db.paginate(query, page=page, per_page=per_page)
 
         # build results
