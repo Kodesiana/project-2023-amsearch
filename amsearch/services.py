@@ -2,6 +2,7 @@ import time
 from dataclasses import dataclass
 
 import requests
+from sqlalchemy import func
 
 from amsearch.db import db, Document
 from amsearch.embeddings import Embeddings
@@ -12,6 +13,7 @@ class ResultItem:
     title: str
     url: str
     excerpt: str
+    distance: float
 
     def __repr__(self):
         return f"<ResultItem title={self.title}>"
@@ -28,7 +30,7 @@ class Results:
 
 
 EMPTY_RESULT = Results(0, 0, 0, [], False, False)
-
+LIMIT_DISTANCE = 1
 
 class SearchService:
 
@@ -77,6 +79,7 @@ class SearchService:
                 title=result["title"],
                 url=result["link"],
                 excerpt=result["snippet"],
+                distance=0,
             ) for result in body["items"]
         ]
 
@@ -88,57 +91,56 @@ class SearchService:
             has_prev=has_prev,
             has_next=has_next,
         )
+    
+    def ___embedding_search(self, q: str, page: int, per_page: int, engine: str) -> Results:
+        # extract embeddings
+        embedding = []
+        distance_col = None
+        if engine == "tfidf":
+            embedding = self.embedding.extract_tfidf(q)
+            distance_col = Document.embedding_tfidf.cosine_distance(embedding).label("distance")
+        else:
+            embedding = self.embedding.extract_bert(q)
+            distance_col = Document.embedding_bert.cosine_distance(embedding).label("distance")
+
+        # build query
+        rows_query = db.select(Document.title, Document.source_url, Document.content, distance_col) \
+            .where(distance_col < LIMIT_DISTANCE) \
+            .order_by(distance_col) \
+            .limit(per_page) \
+            .offset((page - 1) * per_page)
+        total_query = db.select(func.count()) \
+            .select_from(Document) \
+            .where(distance_col < LIMIT_DISTANCE)
+
+        # run query
+        start_time = time.time()
+        paged_rows = db.session.execute(rows_query).all()
+        total_count = db.session.execute(total_query).scalar()
+        execution_time = time.time() - start_time
+
+        # calculate pages
+        total_pages = total_count // per_page + (1 if total_count % per_page > 0 else 0)
+
+        # build results
+        results = []
+        for result in paged_rows:
+            results.append(ResultItem(
+                title=result[0],
+                url=result[1],
+                excerpt=self.__truncate_contents(result[2]),
+                distance=result[3]
+            ))
+
+        return Results(execution_time=execution_time,
+                       total=total_count,
+                       page=page,
+                       items=results,
+                       has_prev=page > 1,
+                       has_next=page < total_pages)
 
     def __tfidf_search(self, q: str, page: int, per_page: int) -> Results:
-        # extract embeddings
-        embedding = self.embedding.extract_tfidf(q)
-
-        # run query
-        start_time = time.time()
-        query = db.select(Document) \
-            .order_by(Document.embedding_tfidf.cosine_distance(embedding))
-        paged_rows = db.paginate(query, page=page, per_page=per_page)
-
-        # build results
-        execution_time = time.time() - start_time
-        results = [
-            ResultItem(
-                title=result.title,
-                url=result.source_url,
-                excerpt=self.__truncate_contents(result.content),
-            ) for result in paged_rows.items
-        ]
-
-        return Results(execution_time=execution_time,
-                       total=paged_rows.total,
-                       page=page,
-                       items=results,
-                       has_prev=paged_rows.has_prev,
-                       has_next=paged_rows.has_next)
+        return self.___embedding_search(q, page, per_page, "tfidf")
 
     def __bert_search(self, q: str, page: int, per_page: int) -> Results:
-        # extract embeddings
-        embedding = self.embedding.extract_bert(q)
-
-        # run query
-        start_time = time.time()
-        query = db.select(Document).order_by(
-            Document.embedding_bert.cosine_distance(embedding))
-        paged_rows = db.paginate(query, page=page, per_page=per_page)
-
-        # build results
-        execution_time = time.time() - start_time
-        results = [
-            ResultItem(
-                title=result.title,
-                url=result.source_url,
-                excerpt=self.__truncate_contents(result.content),
-            ) for result in paged_rows.items
-        ]
-
-        return Results(execution_time=execution_time,
-                       total=paged_rows.total,
-                       page=page,
-                       items=results,
-                       has_prev=paged_rows.has_prev,
-                       has_next=paged_rows.has_next)
+        return self.___embedding_search(q, page, per_page, "bert")

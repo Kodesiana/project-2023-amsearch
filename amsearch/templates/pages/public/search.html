@@ -46,7 +46,7 @@
                     <div class="card mb-4">
                         <div class="card-content">
                             <div class="content">
-                                <a href="{{ result.url }}"><h4>{{ result.title }}</h4></a>
+                                <a href="{{ result.url }}"><h4>{{ result.title }} <small>({{ '{:.2f}'.format(result.distance) }})</small></h4></a>
                                 {{ result.excerpt }}
                             </div>
                         </div>
