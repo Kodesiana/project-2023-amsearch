@@ -13,6 +13,9 @@ RUN apt-get update \
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt --index-url https://download.pytorch.org/whl/cpu --extra-index-url https://pypi.org/simple
 
+# create prod image
+FROM base AS prod
+
 # copy project
 COPY . ./amsearch
 COPY ./logging.conf .
@@ -21,4 +24,4 @@ COPY ./logging.conf .
 EXPOSE 8000
 
 # run server
-CMD ["gunicorn", "--log-config", "logging.conf", "--workers", "2", "--forwarded-allow-ips", "*", "--bind", "0.0.0.0:8000", "amsearch:app"]
+CMD ["gunicorn", "--log-config", "logging.conf", "--workers", "1", "--forwarded-allow-ips", "*", "--bind", "0.0.0.0:8000", "amsearch:app"]

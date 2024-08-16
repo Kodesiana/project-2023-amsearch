@@ -12,9 +12,13 @@ router = Blueprint('admin', __name__)
 @router.route('/admin')
 @login_required
 def list():
-    pagination = db.paginate(db.select(Document).order_by(Document.title))
-    return render_template("pages/admin/list.html", pagination=pagination)
+    q = request.args.get('q', "")
+    if not q:
+        pagination = db.paginate(db.select(Document).order_by(Document.published_at.desc()), per_page=10)
+    else:
+        pagination = db.paginate(db.select(Document).filter(Document.title.ilike(f'%{q}%')).order_by(Document.published_at.desc()), per_page=10)
 
+    return render_template("pages/admin/list.html", pagination=pagination, search_term=q)
 
 @router.route('/admin/create')
 @login_required

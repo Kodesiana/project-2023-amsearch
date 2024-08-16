@@ -10,12 +10,32 @@
             <!-- Header -->
             <div class="is-flex is-justify-content-space-between mb-4">
                 <h4 class="is-size-4 has-text-weight-bold">Dataset</h4>
-                <a class="button is-primary" href="{{ url_for('admin.create') }}">
-                    <span class="icon">
-                        <i class="fa fa-plus"></i>
-                    </span>
-                    <span>Tambah</span>
-                </a>
+                <div class="columns">
+                    <div class="column">
+                        <form action="{{ url_for('admin.list') }}" method="get">
+                            <div class="field has-addons">
+                                <div class="control">
+                                    <input class="input" type="text" name="q" value="{{ search_term }}"
+                                        placeholder="Cari judul...">
+                                </div>
+                                <div class="control">
+                                    <button class="button is-info">
+                                        Cari
+                                    </button>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+
+                    <div class="column is-flex-grow-0">
+                        <a class="button is-primary" href="{{ url_for('admin.create') }}">
+                            <span class="icon">
+                                <i class="fa fa-plus"></i>
+                            </span>
+                            <span>Tambah</span>
+                        </a>
+                    </div>
+                </div>
             </div>
             <!-- Dataset -->
             <table class="table is-striped is-hoverable is-fullwidth">
@@ -24,6 +44,7 @@
                         <th>No</th>
                         <th>Judul</th>
                         <th>Isi</th>
+                        <th>Tanggal Terbit</th>
                         <th>Jumlah Token</th>
                         <th>Aksi</th>
                     </tr>
@@ -31,9 +52,10 @@
                 <tbody>
                     {% for item in pagination.items %}
                     <tr>
-                        <td>{{ loop.index * pagination.page }}</td>
+                        <td>{{ ((pagination.page - 1) * 10) + loop.index }}</td>
                         <td>{{ item.title }}</td>
                         <td>{{ item.content }}</td>
+                        <td>{{ item.published_at }}</td>
                         <td>{{ item.token_count }}</td>
                         <td>
                             <a class="button" href="{{ url_for('admin.update', id=item.id) }}">
@@ -54,17 +76,21 @@
             <!-- Pager -->
             <nav class="pagination" role="navigation" aria-label="pagination">
                 {% if pagination.has_prev %}
-                <a class="pagination-previous" href="{{ url_for('admin.list', page=pagination.prev_num, per_page=pagination.per_page) }}">Previous</a>
+                <a class="pagination-previous"
+                    href="{{ url_for('admin.list', q=search_term, page=pagination.prev_num, per_page=pagination.per_page) }}">Previous</a>
                 {% endif %}
                 {% if pagination.has_next %}
-                <a class="pagination-next" href="{{ url_for('admin.list', page=pagination.next_num, per_page=pagination.per_page) }}">Next page</a>
+                <a class="pagination-next"
+                    href="{{ url_for('admin.list', q=search_term, page=pagination.next_num, per_page=pagination.per_page) }}">Next
+                    page</a>
                 {% endif %}
                 <ul class="pagination-list">
                     {% for page in pagination.iter_pages() %}
                     {% if page %}
                     {% if page != pagination.page %}
                     <li>
-                        <a class="pagination-link" href="{{ url_for('admin.list', page=page, per_page=pagination.per_page) }}">{{ page }}</a>
+                        <a class="pagination-link"
+                            href="{{ url_for('admin.list', q=search_term, page=page, per_page=pagination.per_page) }}">{{ page }}</a>
                     </li>
                     {% else %}
                     <li>
@@ -89,7 +115,6 @@
         deleteButtons.forEach(button => {
             const id = button.dataset.id
             button.addEventListener('click', function deleteItem(e) {
-                console.log(id)
                 Swal.fire({
                     title: 'Hapus data',
                     text: 'Anda yakin menghapus data?',
