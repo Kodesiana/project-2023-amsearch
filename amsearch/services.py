@@ -345,7 +345,7 @@ class SearchService:
         self, stemmer: str, q: str, page: int = 0, per_page: int = 10
     ) -> Results:
         # perform stemming
-        stemmed = self.stem_sentence(q, stemmer)
+        stemmed, _ = self.stem_sentence(q, stemmer)
 
         # extract embeddings
         embedding = self.bert.encode([stemmed])[0]
@@ -429,7 +429,7 @@ class SearchService:
         else:
             stems = self.tokenize(sentence)
 
-        return " ".join(stems)
+        return " ".join(stems), len(stems)
 
     def __truncate_contents(self, contents: str, max_length: int = 200) -> str:
         if len(contents) > max_length:

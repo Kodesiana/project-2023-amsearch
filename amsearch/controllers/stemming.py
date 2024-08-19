@@ -50,9 +50,9 @@ def stem():
     return render_template(
         "pages/public/stemming.html",
         input_text=input_text,
-        output_ams=VectorSearchInstance.stem_sentence(input_text, "ams"),
-        output_purwoko=VectorSearchInstance.stem_sentence(input_text, "purwoko"),
-        output_sastrawi=VectorSearchInstance.stem_sentence(input_text, "sastrawi"),
-        output_ug18=VectorSearchInstance.stem_sentence(input_text, "ug18"),
+        output_ams=VectorSearchInstance.stem_sentence(input_text, "ams")[0],
+        output_purwoko=VectorSearchInstance.stem_sentence(input_text, "purwoko")[0],
+        output_sastrawi=VectorSearchInstance.stem_sentence(input_text, "sastrawi")[0],
+        output_ug18=VectorSearchInstance.stem_sentence(input_text, "ug18")[0],
         stems=stems,
     )

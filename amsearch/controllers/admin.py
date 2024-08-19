@@ -1,6 +1,6 @@
 import uuid
 
-from flask import Blueprint, render_template, redirect, url_for, request
+from flask import Blueprint, flash, render_template, redirect, url_for, request
 from flask_login import login_required
 
 from amsearch.services import VectorSearchInstance
@@ -48,15 +48,20 @@ def update(id: str):
         url=doc.source_url,
         published_at=doc.published_at,
     )
-
+    
 
 @router.route("/admin/remove/<id>")
 @login_required
 def remove(id: str):
     # find and delete from db
     doc = db.get_or_404(Document, id)
+    title = doc.title
+
     db.session.delete(doc)
     db.session.commit()
+
+    # flash message
+    flash(f"Data berhasil dihapus!<br><strong>{ title }</strong>", "success")
 
     return redirect(url_for("admin.list"))
 
@@ -64,47 +69,60 @@ def remove(id: str):
 @router.route("/admin/save", methods=["POST"])
 @login_required
 def save():
-    # get the fields
-    title = request.form.get("title")
-    content = request.form.get("content")
-    url = request.form.get("url")
-    published_at = request.form.get("published_at")
+    try:
+        # get the fields
+        title = request.form.get("title")
+        content = request.form.get("content")
+        url = request.form.get("url")
+        published_at = request.form.get("published_at")
 
-    # stem the content
-    content_stemmed, count = VectorSearchInstance.stem_sentence(content, "ams")
+        # stem the content
+        content_stemmed, count = VectorSearchInstance.stem_sentence(content, "ams")
 
-    # make embeddings
-    eb = VectorSearchInstance.embed(content_stemmed)
+        # make embeddings
+        eb = VectorSearchInstance.embed(content_stemmed)
 
-    # check if this is an edit operation
-    id = request.form.get("id")
-    if id:
-        doc = db.get_or_404(Document, id)
-        doc.title = title
-        doc.content = content
-        doc.token_count = count
-        doc.source_url = url
-        doc.published_at = published_at
-        doc.embedding_bert = eb
-        doc.embedding_tfidf = eb
-    else:
-        # create row
-        doc = Document(
-            id=str(uuid.uuid4()),
+        # check if this is an edit operation
+        id = request.form.get("id")
+        if id:
+            doc = db.get_or_404(Document, id)
+            doc.title = title
+            doc.content = content
+            doc.token_count = count
+            doc.source_url = url
+            doc.published_at = published_at
+            doc.embedding_bert = eb
+            doc.embedding_tfidf = eb
+        else:
+            # create row
+            doc = Document(
+                id=str(uuid.uuid4()),
+                title=title,
+                content=content_stemmed,
+                token_count=count,
+                source_url=url,
+                published_at=published_at,
+                embedding_bert=eb,
+                embedding_tfidf=eb,
+            )
+
+        # add to db
+        if not id:
+            db.session.add(doc)
+
+        # save to db
+        db.session.commit()
+
+        # flash message
+        flash(f"Data berhasil ditambahkan!<br><strong>{ title }</strong>", "success")
+        return redirect(url_for("admin.list"))
+    except:
+        flash(f"Data gagal disimpan!<br>Pastikan semua kolom sudah diisi.", "danger")
+        return render_template("pages/admin/edit.html",
+            id=id,
             title=title,
-            content=content_stemmed,
-            token_count=count,
-            source_url=url,
+            content=content,
+            url=url,
             published_at=published_at,
-            embedding_bert=eb,
-            embedding_tfidf=eb,
         )
 
-    # add to db
-    if not id:
-        db.session.add(doc)
-
-    # save to db
-    db.session.commit()
-
-    return redirect(url_for("admin.list"))
