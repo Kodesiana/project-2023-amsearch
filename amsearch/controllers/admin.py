@@ -3,42 +3,54 @@ import uuid
 from flask import Blueprint, render_template, redirect, url_for, request
 from flask_login import login_required
 
-from amsearch import embedding_service, stemming_service
+from amsearch.services import VectorSearchInstance
 from amsearch.db import db, Document
 
-router = Blueprint('admin', __name__)
+router = Blueprint("admin", __name__)
 
 
-@router.route('/admin')
+@router.route("/admin")
 @login_required
 def list():
-    q = request.args.get('q', "")
+    q = request.args.get("q", "")
     if not q:
-        pagination = db.paginate(db.select(Document).order_by(Document.published_at.desc()), per_page=10)
+        pagination = db.paginate(
+            db.select(Document).order_by(Document.published_at.desc()), per_page=10
+        )
     else:
-        pagination = db.paginate(db.select(Document).filter(Document.title.ilike(f'%{q}%')).order_by(Document.published_at.desc()), per_page=10)
+        pagination = db.paginate(
+            db.select(Document)
+            .filter(Document.title.ilike(f"%{q}%"))
+            .order_by(Document.published_at.desc()),
+            per_page=10,
+        )
 
-    return render_template("pages/admin/list.html", pagination=pagination, search_term=q)
+    return render_template(
+        "pages/admin/list.html", pagination=pagination, search_term=q
+    )
 
-@router.route('/admin/create')
+
+@router.route("/admin/create")
 @login_required
 def create():
     return render_template("pages/admin/edit.html")
 
 
-@router.route('/admin/edit/<id>')
+@router.route("/admin/edit/<id>")
 @login_required
 def update(id: str):
     doc = db.get_or_404(Document, id)
-    return render_template("pages/admin/edit.html",
-                           id=id,
-                           title=doc.title,
-                           content=doc.content,
-                           url=doc.source_url,
-                           published_at=doc.published_at)
+    return render_template(
+        "pages/admin/edit.html",
+        id=id,
+        title=doc.title,
+        content=doc.content,
+        url=doc.source_url,
+        published_at=doc.published_at,
+    )
 
 
-@router.route('/admin/remove/<id>')
+@router.route("/admin/remove/<id>")
 @login_required
 def remove(id: str):
     # find and delete from db
@@ -46,27 +58,26 @@ def remove(id: str):
     db.session.delete(doc)
     db.session.commit()
 
-    return redirect(url_for('admin.list'))
+    return redirect(url_for("admin.list"))
 
 
-@router.route('/admin/save', methods=['POST'])
+@router.route("/admin/save", methods=["POST"])
 @login_required
 def save():
     # get the fields
-    title = request.form.get('title')
-    content = request.form.get('content')
-    url = request.form.get('url')
-    published_at = request.form.get('published_at')
+    title = request.form.get("title")
+    content = request.form.get("content")
+    url = request.form.get("url")
+    published_at = request.form.get("published_at")
 
     # stem the content
-    content_stemmed, count = stemming_service.stem_sentence(content)
+    content_stemmed, count = VectorSearchInstance.stem_sentence(content, "ams")
 
     # make embeddings
-    eb = embedding_service.extract_bert(content_stemmed)
-    et = embedding_service.extract_tfidf(content_stemmed)
+    eb = VectorSearchInstance.embed(content_stemmed)
 
     # check if this is an edit operation
-    id = request.form.get('id')
+    id = request.form.get("id")
     if id:
         doc = db.get_or_404(Document, id)
         doc.title = title
@@ -75,7 +86,7 @@ def save():
         doc.source_url = url
         doc.published_at = published_at
         doc.embedding_bert = eb
-        doc.embedding_tfidf = et
+        doc.embedding_tfidf = eb
     else:
         # create row
         doc = Document(
@@ -86,7 +97,7 @@ def save():
             source_url=url,
             published_at=published_at,
             embedding_bert=eb,
-            embedding_tfidf=et,
+            embedding_tfidf=eb,
         )
 
     # add to db
@@ -96,4 +107,4 @@ def save():
     # save to db
     db.session.commit()
 
-    return redirect(url_for('admin.list'))
+    return redirect(url_for("admin.list"))

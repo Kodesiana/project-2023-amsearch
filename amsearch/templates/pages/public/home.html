@@ -10,26 +10,15 @@
             <div class="columns is-centered mb-6">
                 <img src="/static/logo.png">
             </div>
-            <form action="{{ url_for('search.search') }}">
-                <div class="columns is-centered">
-                    <div class="column is-7">
-                        <div class="field has-addons has-shadow-field">
-                            <input type="submit" hidden />
-                            <input type="hidden" value="bert" name="engine" />
-                            <input type="text" name="q" class="input is-large is-rounded is-rounded" placeholder="Masukan kata yang akan dicari...">
-                        </div>
-                    </div>
+                <div class="columns is-justify-content-center" style="column-gap: 2rem;">
+                    <a type="button" class="button is-large is-primary" href="{{ url_for('stemming.stem') }}">
+                        <span class="has-text-weight-semibold">Stemming</span>
+                    </a>
+
+                    <a type="button" class="button is-large is-info" href="{{ url_for('search.search') }}">
+                        <span class="has-text-weight-semibold">Pencarian</span>
+                    </a>
                 </div>
-                <div class="columns is-centered">
-                    <div class="column is-1">
-                        <div class="field has-addons has-shadow-field">
-                            <button type="button" class="button is-large is-primary">
-                                <span class="has-text-weight-semibold">Cari</span>
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            </form>
         </div>
     </div>
 </section>

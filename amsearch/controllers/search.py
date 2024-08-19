@@ -1,63 +1,48 @@
 from flask import Blueprint, render_template, flash, request
 
-from amsearch import search_service, stemming_service
-from amsearch.services import EMPTY_RESULT
+from amsearch.services import EMPTY_RESULT, VectorSearchInstance
 
-router = Blueprint('search', __name__)
+router = Blueprint("search", __name__)
 
-AVAILABLE_ENGINES = {
-    'bert': "Mesin Pencari AMSearch-BERT",
-    'tfidf': "Mesin Pencari AMSearch-TF IDF",
-    'google': "Mesin Pencari Google",
+AVAILABLE_STEMMER = set(["none", "ams", "purwoko", "sastrawi", "ug18"])
+STEMMER_DESC = {
+    "none": "Tanpa stemming",
+    "ams": "AMS",
+    "purwoko": "Purwoko",
+    "sastrawi": "Sastrawi",
+    "ug18": "UG18",
 }
 
 
-@router.route('/')
-def home():
-    return render_template("pages/public/home.html")
-
-
-@router.route('/search')
+@router.route("/search")
 def search():
     # get search engine
-    search_engine = request.args.get('engine', 'bert')
-    if search_engine not in AVAILABLE_ENGINES:
-        flash("Mesin pencari tidak tersedia")
-        return render_template("pages/public/search.html",
-                               results=EMPTY_RESULT)
+    stemmer = request.args.get("stemmer", "none")
+    if stemmer not in AVAILABLE_STEMMER:
+        stemmer = "none"
 
     # get keyword
-    q = request.args.get('q', '')
+    q = request.args.get("q", "")
     if not q:
         return render_template(
             "pages/public/search.html",
-            engine_desc=AVAILABLE_ENGINES[search_engine],
-            engine=search_engine,
+            stemmer=stemmer,
             keyword="",
             execution_time="0.0",
             results=EMPTY_RESULT,
         )
 
     # get page and per_page
-    page = request.args.get('page', 1, type=int)
-    per_page = request.args.get('per_page', 10, type=int)
-
-    # stem input
-    q, _ = stemming_service.stem_sentence(q)
+    page = request.args.get("page", 1, type=int)
+    per_page = request.args.get("per_page", 10, type=int)
 
     # run search
-    results = search_service.search(search_engine, q, page, per_page)
+    results = VectorSearchInstance.search(stemmer, q, page, per_page)
 
     return render_template(
         "pages/public/search.html",
-        engine_desc=AVAILABLE_ENGINES[search_engine],
-        engine=search_engine,
+        stemmer=STEMMER_DESC[stemmer],
         keyword=q,
         execution_time=f"{results.execution_time:.2f}",
         results=results,
     )
-
-
-@router.route('/about')
-def about():
-    return render_template("pages/public/about.html")

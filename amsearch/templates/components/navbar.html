@@ -19,21 +19,23 @@
             </a>
             {% endif %}
 
-            <a class="navbar-item" href="{{ url_for('search.search', engine='bert') }}">
-                Mesin Pencari BERT
+            <a class="navbar-item" href="{{ url_for('stemming.stem') }}">
+                Stemming
             </a>
 
-            <a class="navbar-item" href="{{ url_for('search.search', engine='tfidf') }}">
-                Mesin Pencari TF-IDF
+            <a class="navbar-item" href="{{ url_for('search.search') }}">
+                Pencarian
             </a>
 
-            <!-- <a class="navbar-item" href="{{ url_for('search.search', engine='google') }}">
-                Mesin Pencari Google
-            </a> -->
-
-            <a class="navbar-item" href="{{ url_for('search.about') }}">
+            <a class="navbar-item" href="{{ url_for('about') }}">
                 Tentang Aplikasi Ini
             </a>
+
+            {% if current_user.is_authenticated %}
+            <a class="navbar-item" href="{{ url_for('statistics.statistics') }}">
+                Statistik
+            </a>
+            {% endif %}
 
             <div class="navbar-item">
                 <div class="buttons">
