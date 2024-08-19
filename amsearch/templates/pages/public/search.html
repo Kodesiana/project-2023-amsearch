@@ -1,88 +1,85 @@
-{% extends "layouts/base.html" %}
+{% extends "layouts/default.html" %}
 
 {% block content %}
-<section class="hero is-fullheight is-light">
-    <div class="hero-head">
-        {% include "components/navbar.html" %}
-    </div>
-    <div class="hero-body p-b-30">
-        <div class="container">
-            <!-- Header -->
-            <h1 class="title is-1 has-text-centered">Pencarian</h1>
+<!-- Header -->
+<h1 class="title is-1 has-text-centered">Pencarian</h1>
 
-            <!-- Search -->
-            <div class="columns is-centered">
-                <div class="column is-7">
-                    {% with messages = get_flashed_messages() %}
-                    {% if messages %}
-                    <div class="notification is-warning">
-                        {% for message in messages %}
-                        {{ message }}
-                        {% endfor %}
-                    </div>
-                    {% else %}
-                    <form action="{{ url_for('search.search') }}">
-                        <input type="submit" hidden />
-                        <input type="hidden" value="{{ engine }}" name="engine" />
-                        <div class="field has-addons has-shadow-field">
-                            <input type="text" class="input is-large" name="q" value="{{ keyword }}">
-                        </div>
+<!-- Search -->
+<div class="columns is-centered">
+    <div class="column is-7">
+        <!-- Show Message when something is wrong -->
+        {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+        {% for category, message in messages %}
+        <div class="notification is-{{ category }}">
+            <button class="delete"></button>
+            {{ message | safe }}        
+        </div>
+        {% endfor %}
+        {% else %}
 
-                        <div class="columns">
-                            <div class="column">
-                                <p class="mt-2 mb-4">Ditemukan {{ '{:,}'.format(results.total) }} dokumen. Lama eksekusi
-                                    {{ execution_time }} detik.</p>
-                            </div>
-                            <div  class="column is-narrow">
-                                <div class="select">
-                                    <select name="stemmer">
-                                        <option value="ams">AMS</option>
-                                        <option value="purwoko">Purwoko</option>
-                                        <option value="sastrawi">Sastrawi</option>
-                                        <option value="ug18">UG18</option>
-                                        <option value="none">Tanpa stemming</option>
-                                    </select>
-                                </div>
-                            </div>
-                        </div>
-                    </form>
-                    {% endif %}
-                    {% endwith %}
-                </div>
+        <!-- Show search form -->
+        <form action="{{ url_for('search.search') }}">
+            <input type="submit" hidden />
+            <input type="hidden" value="{{ engine }}" name="engine" />
+            <div class="field has-addons has-shadow-field">
+                <input type="text" class="input is-large" name="q" value="{{ keyword }}">
             </div>
 
-            <!-- Results -->
-            <div class="columns is-centered">
-                <div class="column is-7">
-                    {% for result in results.items %}
-                    <div class="card mb-4">
-                        <div class="card-content">
-                            <div class="content">
-                                <a href="{{ result.url }}">
-                                    <h4>{{ result.title }} <small>({{ '{:.2f}'.format(result.distance) }})</small></h4>
-                                </a>
-                                {{ result.excerpt }}
-                            </div>
-                        </div>
+            <div class="columns">
+                <div class="column">
+                    <p class="mt-2 mb-4">Ditemukan {{ '{:,}'.format(results.total) }} dokumen. Lama eksekusi
+                        {{ execution_time }} detik.</p>
+                </div>
+                <div class="column is-narrow">
+                    <div class="select">
+                        <select name="stemmer">
+                            <option value="ams">AMS</option>
+                            <option value="purwoko">Purwoko</option>
+                            <option value="sastrawi">Sastrawi</option>
+                            <option value="ug18">UG18</option>
+                            <option value="none">Tanpa stemming</option>
+                        </select>
                     </div>
-                    {% endfor %}
+                </div>
+            </div>
+        </form>
+        {% endif %}
+        {% endwith %}
+    </div>
+</div>
 
-                    <div class="is-flex is-justify-content-space-between">
-                        {% if results.has_prev %}
-                        <a class="button"
-                            href="{{ url_for('search.search', engine=engine, q=keyword, page=results.page-1 ) }}">Prev</a>
-                        {% else %}
-                        <div class="is-invisible"></div>
-                        {% endif %}
-
-                        {% if results.has_next %}
-                        <a class="button"
-                            href="{{ url_for('search.search', engine=engine, q=keyword, page=results.page+1 ) }}">Next</a>
-                        {% endif %}
-                    </div>
+<!-- Results -->
+<div class="columns is-centered">
+    <div class="column is-7">
+        <!-- Search Result -->
+        {% for result in results.items %}
+        <div class="card mb-4">
+            <div class="card-content">
+                <div class="content">
+                    <a href="{{ result.url }}">
+                        <h4>{{ result.title }} <small>({{ '{:.2f}'.format(result.distance) }})</small></h4>
+                    </a>
+                    {{ result.excerpt }}
                 </div>
             </div>
         </div>
+        {% endfor %}
+
+        <!-- Pagination -->
+        <div class="is-flex is-justify-content-space-between">
+            {% if results.has_prev %}
+            <a class="button"
+                href="{{ url_for('search.search', engine=engine, q=keyword, page=results.page-1 ) }}">Prev</a>
+            {% else %}
+            <div class="is-invisible"></div>
+            {% endif %}
+
+            {% if results.has_next %}
+            <a class="button"
+                href="{{ url_for('search.search', engine=engine, q=keyword, page=results.page+1 ) }}">Next</a>
+            {% endif %}
+        </div>
     </div>
-</section>
+</div>
 {% endblock %}

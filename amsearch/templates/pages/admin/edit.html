@@ -1,66 +1,88 @@
-{% extends "layouts/base.html" %}
+{% extends "layouts/default.html" %}
+
+{% block head %}
+<style>
+    .label.is-required::after {
+        content: ' *';
+        color: red;
+    }
+</style>
+{% endblock %}
 
 {% block content %}
-<section class="hero is-fullheight is-light">
-    <div class="hero-head">
-        {% include "components/navbar.html" %}
-    </div>
-    <div class="hero-body p-b-30">
-        <div class="container">
-            <div class="columns is-centered">
-                <div class="column is-7">
-                    <!-- Header -->
-                    <h4 class="is-size-4 has-text-weight-bold mb-4">
-                        {% if id %}
-                        Ubah Data
-                        {% else %}
-                        Tambah Data
-                        {% endif %}
-                    </h4>
+<div class="columns is-centered">
+    <div class="column is-7">
+        <!-- Header -->
+        <h4 class="is-size-4 has-text-weight-bold mb-4">
+            {% if id %}
+            Ubah Data
+            {% else %}
+            Tambah Data
+            {% endif %}
+        </h4>
 
-                    <!-- Form -->
-                    <form action="{{ url_for('admin.save') }}" method="post">
-                        {% if id %}
-                        <input type="hidden" name="id" value="{{ id }}">
-                        {% endif %}
+        <!-- Insert/Update Message -->
+        {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+        {% for category, message in messages %}
+        <div class="notification is-{{ category }}">
+            <button class="delete"></button>
+            {{ message | safe }}
+        </div>
+        {% endfor %}
+        {% endif %}
+        {% endwith %}
 
-                        <div class="field">
-                            <label class="label">Judul</label>
-                            <div class="control">
-                                <input class="input" type="text" name="title" value="{{ title }}">
-                            </div>
-                        </div>
+        <!-- Form -->
+        <form action="{{ url_for('admin.save') }}" method="post">
+            {% if id %}
+            <input type="hidden" name="id" value="{{ id }}">
+            {% endif %}
 
-                        <div class="field">
-                            <label class="label">Isi</label>
-                            <div class="control">
-                                <textarea class="textarea" name="content">{{ content }}</textarea>
-                            </div>
-                        </div>
-
-                        <div class="field">
-                            <label class="label">URL</label>
-                            <div class="control">
-                                <input class="input" type="text" name="url" value="{{ url }}">
-                            </div>
-                        </div>
-
-                        <div class="field">
-                            <label class="label">Tanggal</label>
-                            <div class="control">
-                                <input class="input" type="date" name="published_at" value="{{ published_at }}">
-                            </div>
-                        </div>
-
-                        <div class="field has-addons has-addons-right mt-4">
-                            <div class="control">
-                                <button class="button is-primary">Simpan</button>
-                            </div>
-                        </div>
-                    </form>
+            <div class="field">
+                <label class="label is-required">Judul</label>
+                <div class="control">
+                    <input class="input" type="text" name="title" value="{{ title }}" required>
                 </div>
             </div>
-        </div>
+
+            <div class="field">
+                <label class="label is-required">Isi</label>
+                <div class="control">
+                    <textarea class="textarea" name="content" required>{{ content }}</textarea>
+                </div>
+            </div>
+
+            <div class="field">
+                <label class="label is-required">URL</label>
+                <div class="control">
+                    <input class="input" type="text" name="url" value="{{ url }}" required>
+                </div>
+            </div>
+
+            <div class="field">
+                <label class="label is-required">Tanggal</label>
+                <div class="control">
+                    <input class="input" type="date" name="published_at" value="{{ published_at }}" required>
+                </div>
+            </div>
+
+            <div class="field has-addons has-addons-right mt-4">
+                <div class="control">
+                    <button class="button is-primary">Simpan</button>
+                </div>
+            </div>
+        </form>
     </div>
-</section>
+</div>
+{% endblock %}
+
+{% block script %}
+{{ super() }}
+
+<script>
+    addEventListener("DOMContentLoaded", () => {
+        document.getElementsByName('published_at').forEach(elem => elem.valueAsDate = new Date());
+    })
+</script>
 {% endblock %}

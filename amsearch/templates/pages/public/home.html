@@ -1,25 +1,17 @@
-{% extends "layouts/base.html" %}
+{% extends "layouts/default.html" %}
 
 {% block content %}
-<section class="hero is-fullheight is-light">
-    <div class="hero-head">
-        {% include "components/navbar.html" %}
-    </div>
-    <div class="hero-body p-b-30">
-        <div class="container">
-            <div class="columns is-centered mb-6">
-                <img src="/static/logo.png">
-            </div>
-                <div class="columns is-justify-content-center" style="column-gap: 2rem;">
-                    <a type="button" class="button is-large is-primary" href="{{ url_for('stemming.stem') }}">
-                        <span class="has-text-weight-semibold">Stemming</span>
-                    </a>
+<div class="columns is-centered mb-6">
+    <img src="/static/logo.png">
+</div>
 
-                    <a type="button" class="button is-large is-info" href="{{ url_for('search.search') }}">
-                        <span class="has-text-weight-semibold">Pencarian</span>
-                    </a>
-                </div>
-        </div>
-    </div>
-</section>
+<div class="columns is-justify-content-center" style="column-gap: 2rem;">
+    <a type="button" class="button is-large is-primary" href="{{ url_for('stemming.stem') }}">
+        <span class="has-text-weight-semibold">Stemming</span>
+    </a>
+
+    <a type="button" class="button is-large is-info" href="{{ url_for('search.search') }}">
+        <span class="has-text-weight-semibold">Pencarian</span>
+    </a>
+</div>
 {% endblock %}

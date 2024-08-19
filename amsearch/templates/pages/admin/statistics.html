@@ -1,55 +1,45 @@
-{% extends "layouts/base.html" %}
+{% extends "layouts/default.html" %}
 
 {% block content %}
-<section class="hero is-fullheight is-light">
-    <div class="hero-head">
-        {% include "components/navbar.html" %}
-    </div>
-    <div class="hero-body p-b-30">
-        <div class="container">
-            <!-- Header -->
-            <h1 class="title is-1 has-text-centered">Statistik</h1>
+<!-- Header -->
+<h1 class="title is-1 has-text-centered">Statistik</h1>
 
-            <!-- Statistics Card -->
-            <div class="columns is-3 mt-6">
-                <div class="column">
-                    <div class="box">
-                        <p class="subtitle is-5 has-text-weight-bold">Total Dokumen</p>
-                        <p class="title is-1">{{ total_docs }}</p>
-                    </div>
-                </div>
-
-                <div class="column">
-                    <div class="box">
-                        <p class="subtitle is-5 has-text-weight-bold">Total Token</p>
-                        <p class="title is-1">{{ total_tokens }}</p>
-                    </div>
-                </div>
-
-                <div class="column">
-                    <div class="box">
-                        <p class="subtitle is-5 has-text-weight-bold">Rata-Rata Token per Dokumen</p>
-                        <p class="title is-1">{{ average_tokens_per_doc }}</p>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Word Cloud -->
-            <div class="box">
-                <p class="subtitle is-5 has-text-weight-bold">25 Kata Paling Sering Digunakan</p>
-                <div class="field is-grouped is-grouped-multiline">
-                    {% for item in top_words %}
-                    <div class="control">
-                        <div class="tags has-addons">
-                            <p class="tag is-large is-link">{{ item.text }}</p>
-                            <p class="tag is-large is-dark">{{ item.count }}</p>
-                        </div>
-                    </div>
-                    {% endfor %}
-                </div>
-            </div>
-
+<!-- Statistics Card -->
+<div class="columns is-3 mt-6">
+    <div class="column">
+        <div class="box">
+            <p class="subtitle is-5 has-text-weight-bold">Total Dokumen</p>
+            <p class="title is-1">{{ total_docs }}</p>
         </div>
     </div>
-</section>
+
+    <div class="column">
+        <div class="box">
+            <p class="subtitle is-5 has-text-weight-bold">Total Token</p>
+            <p class="title is-1">{{ total_tokens }}</p>
+        </div>
+    </div>
+
+    <div class="column">
+        <div class="box">
+            <p class="subtitle is-5 has-text-weight-bold">Rata-Rata Token per Dokumen</p>
+            <p class="title is-1">{{ average_tokens_per_doc }}</p>
+        </div>
+    </div>
+</div>
+
+<!-- Word Cloud -->
+<div class="box">
+    <p class="subtitle is-5 has-text-weight-bold">25 Kata Paling Sering Digunakan</p>
+    <div class="field is-grouped is-grouped-multiline">
+        {% for item in top_words %}
+        <div class="control">
+            <div class="tags has-addons">
+                <p class="tag is-large is-link">{{ item.text }}</p>
+                <p class="tag is-large is-dark">{{ item.count }}</p>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
 {% endblock %}
