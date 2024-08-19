@@ -35,7 +35,7 @@ if __name__ == "__main__":
     engine = create_engine("postgresql+psycopg2://kucingmenangis:i32F8H4kqY@localhost:5432/amsearch", echo=True)
 
     # read dataset
-    df = pd.read_csv(f"{ROOT_DATASET}/metadata.csv", delimiter=";")
+    df = pd.read_csv(f"{ROOT_DATASET}/documents/metadata.csv", delimiter=";")
     print("Total records:", len(df))
 
     # proces all rows
@@ -45,7 +45,7 @@ if __name__ == "__main__":
             print("Inserting record", index, end="\r")
 
             # check file exists
-            file_path = f"{ROOT_DATASET}/{row['file_name']}"
+            file_path = f"{ROOT_DATASET}/documents/{row['file_name']}"
             if not os.path.isfile(file_path):
                 missing_files.append(file_path)
                 continue
