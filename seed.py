@@ -7,7 +7,7 @@ import pandas as pd
 from sqlalchemy import create_engine
 from sqlalchemy.orm import DeclarativeBase, Mapped, Session, mapped_column
 
-from amsearch.embeddings import Embeddings, Stemmer
+from amsearch.services import VectorSearchInstance
 
 class Base(DeclarativeBase):
     pass
@@ -29,12 +29,7 @@ ROOT_DATASET = "/home/fahmi/freelance/project-2023-amsearch/dataset"
 
 if __name__ == "__main__":
     # load embedding models
-    embedding_service = Embeddings()
-    embedding_service.load(ROOT_MODELS)
-
-    # create stemmer
-    stemming_service = Stemmer()
-    stemming_service.load(ROOT_MODELS)
+    VectorSearchInstance.load(ROOT_MODELS)
 
     # create postgres engine
     engine = create_engine("postgresql+psycopg2://kucingmenangis:i32F8H4kqY@localhost:5432/amsearch", echo=True)
@@ -59,11 +54,10 @@ if __name__ == "__main__":
             content = open(file_path, "r").read()
 
             # stem
-            stemmed, token_count = stemming_service.stem_sentence(content)
+            stemmed, token_count = VectorSearchInstance.stem_sentence(content)
 
             # make embeddings
-            eb = embedding_service.extract_bert(stemmed).tolist()
-            et = embedding_service.extract_tfidf(stemmed).tolist()
+            eb = VectorSearchInstance.embed(stemmed).tolist()
             
             # make document
             document = Document(
@@ -74,7 +68,7 @@ if __name__ == "__main__":
                 token_count=token_count,
                 published_at=row["published_at"],
                 embedding_bert=eb,
-                embedding_tfidf=et
+                embedding_tfidf=eb
             )
 
             # insert
