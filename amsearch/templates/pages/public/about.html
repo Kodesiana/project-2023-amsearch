@@ -1,48 +1,66 @@
 {% extends "layouts/default.html" %}
 
 {% block content %}
-<!-- Logo -->
-<div class="columns is-centered">
-    <img src="/static/logo.png">
-</div>
+<!-- Header Section -->
+<section class="section has-text-centered">
+  <div class="container">
+    <figure class="image is-inline-block">
+      <img src="/static/logo-stylized.png" alt="Logo Amsearch Engine">
+    </figure>
+    <h2 class="subtitle is-4 mt-4">
+      Discover the Unseen, Unearth the Answers, Unleash Your Curiosity!
+      <span class="icon has-text-success">
+        <i class="fa-solid fa-globe"></i>
+      </span>
 
-<!-- Tagline -->
-<h2 class="subtitle">
-    <span class="has-text-centered is-block">
-        Discover the Unseen, Unearth the Answers, Unleash Your Curiosity! 🌐🔍
-    </span>
-</h2>
+      <span class="icon has-text-info">
+        <i class="fa-solid fa-magnifying-glass"></i>
+      </span>
+    </h2>
+  </div>
+</section>
 
-<!-- Contents -->
-<div class="columns is-centered mt-6">
-    <div class="column is-7">
-        <p>
-            Selamat datang di Amsearch Engine, pintu gerbang pengetahuan yang tak terbatas! Dengan teknologi
-            terdepan, kami mempersembahkan pengalaman pencarian yang cepat, akurat, dan menyenangkan. Mari
-            jelajahi dunia dengan ExploreX dan temukan jawaban untuk setiap pertanyaan yang menggelitik
-            pikiran Anda!
+<!-- Introduction Section -->
+<section class="section">
+  <div class="container">
+    <div class="columns is-centered">
+      <div class="column is-12-mobile is-10-tablet is-8-desktop">
+        <p class="is-size-5">
+          Selamat datang di Amsearch Engine, pintu gerbang pengetahuan yang tak terbatas! Dengan teknologi
+          terdepan, kami mempersembahkan pengalaman pencarian yang cepat, akurat, dan menyenangkan. Mari
+          jelajahi dunia dengan ExploreX dan temukan jawaban untuk setiap pertanyaan yang menggelitik
+          pikiran Anda!
         </p>
-
-        <h4 class="mt-4 is-size-5 has-text-weight-semibold">[Fitur Unggulan]</h4>
-        <ol>
-            <li>Pencarian Cepat Teks: Waktu adalah aset berharga. Dengan ExploreX, temukan jawaban dan
-                informasi
-                yang Anda cari dalam sekejap. Tidak perlu menunggu, hanya ketuk dan temukan!</li>
-            <li>Antarmuka Intuitif Teks: ExploreX didesain untuk memastikan setiap pengguna merasa nyaman
-                saat
-                menggunakannya. Dengan antarmuka intuitif, Anda akan menjelajahi dunia pengetahuan dengan
-                lancar.</li>
-            <li>Hasil Akurat Teks: Kami mengerti pentingnya keandalan informasi. ExploreX memberikan hasil
-                pencarian yang akurat dan tepercaya, sehingga Anda dapat mengandalkan setiap jawaban yang
-                ditemukan.</li>
-            <li>Pencarian Multibahasa Teks: Jangan biarkan batasan bahasa menghalangi pengetahuan. ExploreX
-                mendukung berbagai bahasa, memungkinkan Anda untuk mencari informasi dari seluruh dunia.
-            </li>
-            <li>Filter Kustom Teks: Sesuaikan pencarian Anda dengan filter kustom kami. Saring hasil
-                berdasarkan
-                tanggal, sumber, atau jenis konten untuk mendapatkan informasi yang paling relevan dengan
-                kebutuhan Anda.</li>
-        </ol>
+      </div>
     </div>
-</div>
+  </div>
+</section>
+
+<!-- Features Section -->
+<section class="section">
+  <div class="container">
+    <div class="columns is-centered">
+      <div class="column is-12-mobile is-10-tablet is-8-desktop">
+        <h4 class="title is-5 has-text-weight-semibold has-text-black">Fitur Unggulan</h4>
+        <ul class="content is-medium has-text-justified">
+          <li><span class="has-text-success">Pencarian Cepat:</span> Waktu adalah aset berharga. Dengan ExploreX, temukan jawaban dan
+            informasi
+            yang Anda cari dalam sekejap. Tidak perlu menunggu, hanya ketuk dan temukan!</li>
+          <li><span class="has-text-success">Antarmuka Intuitif:</span> ExploreX didesain untuk memastikan setiap pengguna merasa nyaman saat
+            menggunakannya. Dengan antarmuka intuitif, Anda akan menjelajahi dunia pengetahuan dengan
+            lancar.</li>
+          <li><span class="has-text-success">Hasil Akurat:</span> Kami mengerti pentingnya keandalan informasi. ExploreX memberikan hasil
+            pencarian yang akurat dan tepercaya, sehingga Anda dapat mengandalkan setiap jawaban yang
+            ditemukan.</li>
+          <li><span class="has-text-success">Pencarian Multibahasa:</span> Jangan biarkan batasan bahasa menghalangi pengetahuan. ExploreX
+            mendukung berbagai bahasa, memungkinkan Anda untuk mencari informasi dari seluruh dunia.</li>
+          <li><span class="has-text-success">Filter Kustom:</span> Sesuaikan pencarian Anda dengan filter kustom kami. Saring hasil
+            berdasarkan
+            tanggal, sumber, atau jenis konten untuk mendapatkan informasi yang paling relevan dengan
+            kebutuhan Anda.</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
 {% endblock %}

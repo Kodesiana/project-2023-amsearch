@@ -1,115 +1,159 @@
 {% extends "layouts/default.html" %}
 
 {% block content %}
-<h1 class="title is-1 has-text-centered">Stemming</h1>
+<h1 class="subtitle is-2 has-text-centered">Stemming</h1>
 
-<!-- File Selector -->
-<div class="file has-name mb-4">
-    <label class="file-label">
-        <input id="input-file" class="file-input" type="file" name="input-file" accept="text/plain" />
-        <span class="file-cta">
+<form id="stemming-form" action="{{ url_for('stemming.stem') }}" method="post" class="mb-4">
+  <div class="card">
+    <div class="card-content">
+
+      <!-- File Selector -->
+      <div class="file has-name mb-4">
+        <label class="file-label">
+          <input id="input-file" class="file-input" type="file" name="input-file" accept="text/plain" />
+          <span class="file-cta">
             <span class="file-icon">
-                <i class="fas fa-upload"></i>
+              <i class="fas fa-upload"></i>
             </span>
-            <span class="file-label"> Pilih file... </span>
-        </span>
-        <span id="input-file-name" class="file-name"> Belum ada file dipilih </span>
-    </label>
-</div>
+            <span class="file-label"> Pilih berkas... </span>
+          </span>
+          <span id="input-file-name" class="file-name"> Belum ada teks dipilih </span>
+        </label>
+      </div>
 
-<!-- Input Text -->
-<form action="{{ url_for('stemming.stem') }}" method="post" class="mb-6">
-    <textarea id="input-text" name="input-text" class="textarea" rows="10"
+      <!-- Input Text -->
+      <textarea id="input-text" name="input-text" class="textarea" rows="10" style="min-height: 200px;"
         placeholder="Input teks">{{ input_text }}</textarea>
 
-    <div class="columns is-justify-content-center mt-5">
-        <div class="field has-addons has-shadow-field">
-            <button type="submit" class="button is-large is-primary">
-                <span class="has-text-weight-semibold">Proses Stemming</span>
-            </button>
+      <div class="columns is-centered mt-4">
+        <div class="column is-half is-full-mobile">
+          <button id="submit-button" type="submit" class="button is-medium is-dark is-fullwidth" disabled>
+            <span class="has-text-weight-semibold">Proses Stemming</span>
+          </button>
         </div>
+      </div>
     </div>
+  </div>
 </form>
 
 {% if stems %}
 <!-- Result Stemming Text -->
-<div class="columns mt-2 is-3">
-    <div class="column box is-shadowless">
-        <p class="subtitle is-5 m-1">Hasil Stemming AMS</p>
-        <p>{{ output_ams }}</p>
+<div class="columns is-multiline mt-2">
+  <div class="column is-full-mobile is-half-tablet is-one-quarter-desktop">
+    <div class="card">
+      <header class="card-header">
+        <p class="card-header-title">Hasil Stemming AMS</p>
+      </header>
+      <div class="card-content">
+        <div class="content">
+          <p>{{ output_ams }}</p>
+        </div>
+      </div>
     </div>
-
-    <div class="column box is-shadowless">
-        <p class="subtitle is-5 m-1">Hasil Stemming Purwoko</p>
-        <p>{{ output_purwoko }}</p>
+  </div>
+  <div class="column is-full-mobile is-half-tablet is-one-quarter-desktop">
+    <div class="card">
+      <header class="card-header">
+        <p class="card-header-title">Hasil Stemming Purwoko</p>
+      </header>
+      <div class="card-content">
+        <div class="content">
+          <p>{{ output_purwoko }}</p>
+        </div>
+      </div>
     </div>
-
-    <div class="column box is-shadowless">
-        <p class="subtitle is-5 m-1">Hasil Stemming Sastrawi</p>
-        <p>{{ output_sastrawi }}</p>
+  </div>
+  <div class="column is-full-mobile is-half-tablet is-one-quarter-desktop">
+    <div class="card">
+      <header class="card-header">
+        <p class="card-header-title">Hasil Stemming Sastrawi</p>
+      </header>
+      <div class="card-content">
+        <div class="content">
+          <p>{{ output_sastrawi }}</p>
+        </div>
+      </div>
     </div>
-
-    <div class="column box is-shadowless">
-        <p class="subtitle is-5 m-1">Hasil Stemming UG18</p>
-        <p>{{ output_ug18 }}</p>
+  </div>
+  <div class="column is-full-mobile is-half-tablet is-one-quarter-desktop">
+    <div class="card">
+      <header class="card-header">
+        <p class="card-header-title">Hasil Stemming UG18</p>
+      </header>
+      <div class="card-content">
+        <div class="content">
+          <p>{{ output_ug18 }}</p>
+        </div>
+      </div>
     </div>
+  </div>
 </div>
-
-<!-- Stemming per Word/Token -->
-<table class="table is-striped is-hoverable is-fullwidth mt-5">
+<div class="card">
+  <!-- Stemming per Word/Token -->
+  <table class="table is-striped is-hoverable is-fullwidth mb-2" style="border-radius: var(--bulma-card-radius);">
     <thead>
-        <tr>
-            <th>Kata/Token</th>
-            <th>AMS</th>
-            <th>Purwoko</th>
-            <th>Sastrawi</th>
-            <th>UG18</th>
-        </tr>
+      <tr>
+        <th>Kata/Token</th>
+        <th>AMS</th>
+        <th>Purwoko</th>
+        <th>Sastrawi</th>
+        <th>UG18</th>
+      </tr>
     </thead>
     <tbody>
-        {% for item in stems %}
-        <tr>
-            <td>{{ item.original }}</td>
-            <td>{{ item.ams }}</td>
-            <td>{{ item.purwoko }}</td>
-            <td>{{ item.sastrawi }}</td>
-            <td>{{ item.ug18 }}</td>
-        </tr>
-        {% endfor %}
+      {% for item in stems %}
+      <tr>
+        <td>{{ item.original }}</td>
+        <td>{{ item.ams }}</td>
+        <td>{{ item.purwoko }}</td>
+        <td>{{ item.sastrawi }}</td>
+        <td>{{ item.ug18 }}</td>
+      </tr>
+      {% endfor %}
     </tbody>
-</table>
+  </table>
+</div>
+
 {% endif %}
 {% endblock %}
+
 
 {% block script %}
 {{ super() }}
 
 <script>
-    addEventListener("DOMContentLoaded", () => {
-        const fileInput = document.getElementById("input-file");
-        fileInput.onchange = () => {
-            // check if file is selected
-            if (fileInput.files.length === 0) {
-                return;
-            }
+  addEventListener("DOMContentLoaded", () => {
+    const fileInput = document.getElementById("input-file");
+    const inputText = document.getElementById("input-text");
+    const submitButton = document.getElementById("submit-button");
 
-            // get the file
-            const file = fileInput.files[0];
+    // Function to toggle the submit button state
+    const toggleSubmitButton = () => {
+      submitButton.disabled = inputText.value.trim().length === 0;
+    };
 
-            // set filename
-            const fileName = document.getElementById("input-file-name");
-            fileName.textContent = file.name;
+    // File input onchange event
+    fileInput.onchange = () => {
+      if (fileInput.files.length === 0) return;
 
-            // read text file
-            const reader = new FileReader();
-            reader.readAsText(file, "UTF-8");
-            reader.onload = function (evt) {
-                document.getElementById("input-text").value = evt.target.result;
-            }
-            reader.onerror = function (evt) {
-                document.getElementById("input-text").value = "Gagal membaca file! Coba file lain.";
-            }
-        };
-    })
+      const file = fileInput.files[0];
+      const fileName = document.getElementById("input-file-name");
+      fileName.textContent = file.name;
+
+      const reader = new FileReader();
+      reader.readAsText(file, "UTF-8");
+      reader.onload = function (evt) {
+        inputText.value = evt.target.result;
+        toggleSubmitButton(); // Enable submit button if there's text
+      };
+      reader.onerror = function (evt) {
+        inputText.value = "Gagal membaca file! Coba file lain.";
+        toggleSubmitButton(); // Disable submit button on error
+      };
+    };
+
+    // Textarea input event
+    inputText.addEventListener("input", toggleSubmitButton);
+  });
 </script>
 {% endblock %}

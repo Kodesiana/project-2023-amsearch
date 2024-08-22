@@ -2,44 +2,56 @@
 
 {% block content %}
 <!-- Header -->
-<h1 class="title is-1 has-text-centered">Statistik</h1>
+<h1 class="subtitle is-1 has-text-centered">Statistik</h1>
 
 <!-- Statistics Card -->
-<div class="columns is-3 mt-6">
-    <div class="column">
-        <div class="box">
-            <p class="subtitle is-5 has-text-weight-bold">Total Dokumen</p>
-            <p class="title is-1">{{ total_docs }}</p>
+<div class="columns is-variable is-multiline mt-6">
+    {% if total_docs or total_tokens or average_tokens_per_doc %}
+        <div class="column is-full-mobile is-half-tablet is-one-third-widescreen">
+            <div class="box">
+                <p class="subtitle is-5 has-text-weight-bold">Total Dokumen</p>
+                <p class="subtitle is-1">{{ total_docs }}</p>
+            </div>
         </div>
-    </div>
 
-    <div class="column">
-        <div class="box">
-            <p class="subtitle is-5 has-text-weight-bold">Total Token</p>
-            <p class="title is-1">{{ total_tokens }}</p>
+        <div class="column is-full-mobile is-half-tablet is-one-third-widescreen">
+            <div class="box">
+                <p class="subtitle is-5 has-text-weight-bold">Total Token</p>
+                <p class="subtitle is-1">{{ total_tokens }}</p>
+            </div>
         </div>
-    </div>
 
-    <div class="column">
-        <div class="box">
-            <p class="subtitle is-5 has-text-weight-bold">Rata-Rata Token per Dokumen</p>
-            <p class="title is-1">{{ average_tokens_per_doc }}</p>
+        <div class="column is-full-mobile is-full-tablet is-one-third-widescreen">
+            <div class="box">
+                <p class="subtitle is-5 has-text-weight-bold">Rata-Rata Token per Dokumen</p>
+                <p class="subtitle is-1">{{ average_tokens_per_doc }}</p>
+            </div>
         </div>
-    </div>
+    {% else %}
+        <div class="column">
+            <div class="notification is-warning has-text-centered">
+                Data statistik tidak tersedia.
+            </div>
+        </div>
+    {% endif %}
 </div>
 
 <!-- Word Cloud -->
 <div class="box">
     <p class="subtitle is-5 has-text-weight-bold">25 Kata Paling Sering Digunakan</p>
     <div class="field is-grouped is-grouped-multiline">
-        {% for item in top_words %}
-        <div class="control">
-            <div class="tags has-addons">
-                <p class="tag is-large is-link">{{ item.text }}</p>
-                <p class="tag is-large is-dark">{{ item.count }}</p>
+        {% if top_words %}
+            {% for item in top_words %}
+            <div class="control">
+                <div class="tags has-addons">
+                    <p class="tag is-large is-link">{{ item.text }}</p>
+                    <p class="tag is-large is-dark">{{ item.count }}</p>
+                </div>
             </div>
-        </div>
-        {% endfor %}
+            {% endfor %}
+        {% else %}
+            <p class="has-text-centered">Tidak ada data kata yang tersedia.</p>
+        {% endif %}
     </div>
 </div>
 {% endblock %}

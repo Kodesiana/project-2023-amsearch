@@ -1,45 +1,56 @@
 {% extends "layouts/login.html" %}
 
 {% block content %}
-<div class="columns is-centered">
-    <div class="column is-5-tablet is-4-desktop is-3-widescreen">
-        <form class="box" action="{{ url_for('auth.login') }}" method="post">
-            <!-- Login Error -->
-            {% with messages = get_flashed_messages() %}
-            {% if messages %}
-            <div class="notification is-danger">
-                {% for message in messages %}
-                {{ message }}
-                {% endfor %}
-            </div>
-            {% endif %}
-            {% endwith %}
-
-            <!-- Login Form -->
-            <div class="field">
-                <label for="" class="label">Username</label>
-                <div class="control has-icons-left">
-                    <input type="text" class="input" name="username" placeholder="Username" required>
-                    <span class="icon is-small is-left">
-                        <i class="fa fa-user"></i>
-                    </span>
-                </div>
-            </div>
-            <div class="field">
-                <label for="" class="label">Password</label>
-                <div class="control has-icons-left">
-                    <input type="password" class="input" name="password" placeholder="Password" required>
-                    <span class="icon is-small is-left">
-                        <i class="fa fa-lock"></i>
-                    </span>
-                </div>
-            </div>
-            <div class="field">
-                <button class="button is-success">
-                    Login
-                </button>
-            </div>
-        </form>
+<div class="columns is-centered is-mobile">
+  <div class="column is-10-mobile is-8-tablet is-5-desktop is-4-widescreen">
+    <!-- logo -->
+    <div class="has-text-centered">
+      <img src="{{ url_for('static', filename='logo-hd.png') }}" alt="logo" width="100">
     </div>
+    <form class="box" action="{{ url_for('auth.login') }}" method="post">
+
+
+
+      <!-- Login Form -->
+      <div class="field">
+        <label for="username" class="label has-text-black">Username</label>
+        <div class="control has-icons-left">
+          <input type="text" class="input" name="username" placeholder="Username" required>
+          <span class="icon is-small is-left">
+            <i class="fa fa-user"></i>
+          </span>
+        </div>
+      </div>
+      <div class="field">
+        <label for="password" class="label has-text-black">Password</label>
+        <div class="control has-icons-left">
+          <input type="password" class="input" name="password" placeholder="Password" required>
+          <span class="icon is-small is-left">
+            <i class="fa fa-lock"></i>
+          </span>
+        </div>
+      </div>
+      <div class="field">
+        <button class="button is-success is-fullwidth">
+          Login
+        </button>
+      </div>
+    </form>
+    <!-- Login Error -->
+    {% with messages = get_flashed_messages() %}
+    {% if messages %}
+    <div class="notification is-danger">
+      {% for message in messages %}
+      {{ message }}
+      {% endfor %}
+    </div>
+    {% else %}
+    <div class="notification has-background-success-light">
+      <p>  </p>
+    </div>
+    {% endif %}
+
+    {% endwith %}
+  </div>
 </div>
 {% endblock %}

@@ -1,88 +1,126 @@
-{% extends "layouts/default.html" %}
+{% extends "layouts/admin.html" %}
 
 {% block head %}
 <style>
-    .label.is-required::after {
-        content: ' *';
-        color: red;
+  .label.is-required::after {
+    content: ' *';
+    color: red;
+  }
+
+  .card {
+    height: 100%;
+  }
+
+  @media screen and (max-width: 768px) {
+    .column.is-7 {
+      width: 100%;
     }
+  }
 </style>
 {% endblock %}
 
 {% block content %}
-<div class="columns is-centered">
-    <div class="column is-7">
-        <!-- Header -->
-        <h4 class="is-size-4 has-text-weight-bold mb-4">
-            {% if id %}
-            Ubah Data
-            {% else %}
-            Tambah Data
-            {% endif %}
-        </h4>
+<section class="section">
+  <div class="container">
+    <div class="columns is-centered">
+      <div class="column is-7-desktop is-10-tablet">
+        <div class="card">
+          <div class="card-content">
+            <h4 class="subtitle is-4 has-text-centered mb-5">
+              {% if id %}
+              Ubah Data
+              {% else %}
+              Tambah Data
+              {% endif %}
+            </h4>
 
-        <!-- Insert/Update Message -->
-        {% with messages = get_flashed_messages(with_categories=true) %}
-        {% if messages %}
-        {% for category, message in messages %}
-        <div class="notification is-{{ category }}">
-            <button class="delete"></button>
-            {{ message | safe }}
+            {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+            {% for category, message in messages %}
+            <div class="notification is-{{ category }} is-light">
+              <button class="delete"></button>
+              {{ message | safe }}
+            </div>
+            {% endfor %}
+            {% endif %}
+            {% endwith %}
+
+            <form action="{{ url_for('admin.save') }}" method="post">
+              {% if id %}
+              <input type="hidden" name="id" value="{{ id }}">
+              {% endif %}
+
+              <div class="field">
+                <label class="label has-text-black is-required">Judul</label>
+                <div class="control">
+                  <input class="input" type="text" name="title" value="{{ title }}" required>
+                </div>
+              </div>
+
+              <div class="field">
+                <label class="label has-text-black is-required">Isi</label>
+                <div class="control">
+                  <textarea class="textarea" name="content" rows="6" required>{{ content }}</textarea>
+                </div>
+              </div>
+
+              <div class="field">
+                <label class="label has-text-black is-required">URL</label>
+                <div class="control has-icons-left">
+                  <input class="input" name="source_url" value="{{ url }}" required>
+                  <span class="icon is-small is-left">
+                    <i class="fas fa-link"></i>
+                  </span>
+                </div>
+              </div>
+
+              <div class="field">
+                <label class="label has-text-black is-required">Tanggal</label>
+                <div class="control has-icons-left">
+                  <input class="input" type="date" name="published_at" value="{{ published_at }}" required>
+                  <span class="icon is-small is-left">
+                    <i class="fas fa-calendar"></i>
+                  </span>
+                </div>
+              </div>
+
+              <div class="field is-grouped is-grouped-right mt-5">
+                <div class="control">
+                  <a href="{{ url_for('admin.list') }}" class="button is-light">Batal</a>
+                </div>
+                <div class="control">
+                  <button type="submit" class="button is-primary">Simpan</button>
+                </div>
+              </div>
+            </form>
+          </div>
         </div>
-        {% endfor %}
-        {% endif %}
-        {% endwith %}
-
-        <!-- Form -->
-        <form action="{{ url_for('admin.save') }}" method="post">
-            {% if id %}
-            <input type="hidden" name="id" value="{{ id }}">
-            {% endif %}
-
-            <div class="field">
-                <label class="label is-required">Judul</label>
-                <div class="control">
-                    <input class="input" type="text" name="title" value="{{ title }}" required>
-                </div>
-            </div>
-
-            <div class="field">
-                <label class="label is-required">Isi</label>
-                <div class="control">
-                    <textarea class="textarea" name="content" required>{{ content }}</textarea>
-                </div>
-            </div>
-
-            <div class="field">
-                <label class="label is-required">URL</label>
-                <div class="control">
-                    <input class="input" type="text" name="url" value="{{ url }}" required>
-                </div>
-            </div>
-
-            <div class="field">
-                <label class="label is-required">Tanggal</label>
-                <div class="control">
-                    <input class="input" type="date" name="published_at" value="{{ published_at }}" required>
-                </div>
-            </div>
-
-            <div class="field has-addons has-addons-right mt-4">
-                <div class="control">
-                    <button class="button is-primary">Simpan</button>
-                </div>
-            </div>
-        </form>
+      </div>
     </div>
-</div>
+  </div>
+</section>
 {% endblock %}
 
 {% block script %}
 {{ super() }}
-
 <script>
-    addEventListener("DOMContentLoaded", () => {
-        document.getElementsByName('published_at').forEach(elem => elem.valueAsDate = new Date());
-    })
+  document.addEventListener('DOMContentLoaded', () => {
+    // Set default date to today
+    const dateInputs = document.querySelectorAll('input[type="date"]');
+    dateInputs.forEach(input => {
+      if (!input.value) {
+        input.valueAsDate = new Date();
+      }
+    });
+
+    // Initialize Bulma components
+    const notifications = document.querySelectorAll('.notification .delete');
+    notifications.forEach(deleteButton => {
+      const notification = deleteButton.parentNode;
+      deleteButton.addEventListener('click', () => {
+        notification.parentNode.removeChild(notification);
+      });
+    });
+  });
 </script>
 {% endblock %}

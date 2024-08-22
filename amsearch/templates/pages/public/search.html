@@ -2,84 +2,114 @@
 
 {% block content %}
 <!-- Header -->
-<h1 class="title is-1 has-text-centered">Pencarian</h1>
+<h1 class="subtitle is-3 has-text-centered">Pencarian</h1>
 
 <!-- Search -->
 <div class="columns is-centered">
-    <div class="column is-7">
-        <!-- Show Message when something is wrong -->
-        {% with messages = get_flashed_messages(with_categories=true) %}
-        {% if messages %}
-        {% for category, message in messages %}
-        <div class="notification is-{{ category }}">
-            <button class="delete"></button>
-            {{ message | safe }}        
-        </div>
-        {% endfor %}
-        {% else %}
-
-        <!-- Show search form -->
-        <form action="{{ url_for('search.search') }}">
-            <input type="submit" hidden />
-            <input type="hidden" value="{{ engine }}" name="engine" />
-            <div class="field has-addons has-shadow-field">
-                <input type="text" class="input is-large" name="q" value="{{ keyword }}">
-            </div>
-
-            <div class="columns">
-                <div class="column">
-                    <p class="mt-2 mb-4">Ditemukan {{ '{:,}'.format(results.total) }} dokumen. Lama eksekusi
-                        {{ execution_time }} detik.</p>
-                </div>
-                <div class="column is-narrow">
-                    <div class="select">
-                        <select name="stemmer">
-                            <option value="ams">AMS</option>
-                            <option value="purwoko">Purwoko</option>
-                            <option value="sastrawi">Sastrawi</option>
-                            <option value="ug18">UG18</option>
-                            <option value="none">Tanpa stemming</option>
-                        </select>
-                    </div>
-                </div>
-            </div>
-        </form>
-        {% endif %}
-        {% endwith %}
+  <div class="column  is-12-mobile is-10-tablet is-8-desktop">
+    <!-- Show Message when something is wrong -->
+    {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+    {% for category, message in messages %}
+    <div class="notification is-{{ category }}">
+      <button class="delete"></button>
+      {{ message | safe }}
     </div>
+    {% endfor %}
+    {% else %}
+
+    <!-- Show search form -->
+    <form id="search-form" action="{{ url_for('search.search') }}" method="get">
+      <input type="hidden" value="{{ engine }}" name="engine" />
+      <div class="field has-addons">
+        <div class="control is-expanded">
+          <input id="search-input" type="text" class="input is-large" name="q" value="{{ keyword }}"
+            placeholder="Masukkan kata kunci" required>
+        </div>
+        <div class="control">
+          <button id="search-button" type="submit" class="button is-large is-dark" disabled>
+            Cari
+          </button>
+        </div>
+      </div>
+
+      <div class="columns">
+        <div class="column">
+          <p class="mt-2 mb-4">Ditemukan {{ '{:,}'.format(results.total) }} dokumen. Lama eksekusi
+            {{ execution_time }} detik.</p>
+        </div>
+        <div class="column is-narrow">
+          <div class="select">
+            <select name="stemmer">
+              <option value="ams" {% if engine=='ams' %}selected{% endif %}>AMS</option>
+              <option value="purwoko" {% if engine=='purwoko' %}selected{% endif %}>Purwoko</option>
+              <option value="sastrawi" {% if engine=='sastrawi' %}selected{% endif %}>Sastrawi</option>
+              <option value="ug18" {% if engine=='ug18' %}selected{% endif %}>UG18</option>
+              <option value="none" {% if engine=='none' %}selected{% endif %}>Tanpa stemming</option>
+            </select>
+          </div>
+        </div>
+      </div>
+    </form>
+    {% endif %}
+    {% endwith %}
+  </div>
 </div>
 
 <!-- Results -->
 <div class="columns is-centered">
-    <div class="column is-7">
-        <!-- Search Result -->
-        {% for result in results.items %}
-        <div class="card mb-4">
-            <div class="card-content">
-                <div class="content">
-                    <a href="{{ result.url }}">
-                        <h4>{{ result.title }} <small>({{ '{:.2f}'.format(result.distance) }})</small></h4>
-                    </a>
-                    {{ result.excerpt }}
-                </div>
-            </div>
-        </div>
-        {% endfor %}
+  <div class="column is-12-mobile is-10-tablet is-8-desktop">
+    <!-- Search Result -->
+    {% for result in results.items %}
 
-        <!-- Pagination -->
-        <div class="is-flex is-justify-content-space-between">
-            {% if results.has_prev %}
-            <a class="button"
-                href="{{ url_for('search.search', engine=engine, q=keyword, page=results.page-1 ) }}">Prev</a>
-            {% else %}
-            <div class="is-invisible"></div>
-            {% endif %}
-
-            {% if results.has_next %}
-            <a class="button"
-                href="{{ url_for('search.search', engine=engine, q=keyword, page=results.page+1 ) }}">Next</a>
-            {% endif %}
+    <article class="media card p-4">
+      <div class="media-content">
+        <div class="content">
+          <p>
+            <strong class="subtitle is-4 ">{{ result.title }} </strong> <small>({{ '{:.2f}'.format(result.distance)
+              }})</small>
+            <br /><br />
+            {{ result.excerpt }}
+          </p>
         </div>
+
+      </div>
+    </article>
+    {% endfor %}
+
+    <!-- Pagination -->
+    <div class="is-flex is-justify-content-space-between">
+      {% if results.has_prev %}
+      <a class="button" href="{{ url_for('search.search', engine=engine, q=keyword, page=results.page-1 ) }}">Prev</a>
+      {% else %}
+      <div class="is-invisible"></div>
+      {% endif %}
+
+      {% if results.has_next %}
+      <a class="button" href="{{ url_for('search.search', engine=engine, q=keyword, page=results.page+1 ) }}">Next</a>
+      {% endif %}
     </div>
+  </div>
 </div>
+{% endblock %}
+
+{% block script %}
+{{ super() }}
+
+<script>
+  document.addEventListener("DOMContentLoaded", () => {
+    const searchInput = document.getElementById("search-input");
+    const searchButton = document.getElementById("search-button");
+
+    const toggleSearchButton = () => {
+      searchButton.disabled = searchInput.value.trim().length === 0;
+    };
+
+    // Initial check
+    toggleSearchButton();
+
+    // Update button state on input
+    searchInput.addEventListener("input", toggleSearchButton);
+  });
+</script>
 {% endblock %}

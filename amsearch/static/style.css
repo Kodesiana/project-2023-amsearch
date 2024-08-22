@@ -1,0 +1,17 @@
+@view-transition {
+  navigation: auto;
+}
+
+:root {
+  color-scheme: light;
+
+}
+
+.navbar {
+  view-transition-name: navbar;
+}
+
+/* make it non transitionable */
+::view-transition(navbar) {
+  transition: none;
+}

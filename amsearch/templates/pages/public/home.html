@@ -1,17 +1,29 @@
 {% extends "layouts/default.html" %}
 
 {% block content %}
+
 <div class="columns is-centered mb-6">
-    <img src="/static/logo.png">
+    <img src="/static/logo-stylized.png">
 </div>
 
-<div class="columns is-justify-content-center" style="column-gap: 2rem;">
-    <a type="button" class="button is-large is-primary" href="{{ url_for('stemming.stem') }}">
-        <span class="has-text-weight-semibold">Stemming</span>
-    </a>
+<div class="columns is-justify-content-center is-tablet" style="column-gap: 2rem;">
+    <div class="column is-half-tablet is-one-third-desktop">
+        <a type="button" class="button is-large is-primary is-fullwidth" href="{{ url_for('stemming.stem') }}">
+            <span class="icon is-small">
+                <i class="fa fa-seedling"></i>
+            </span>
+            <span class="has-text-weight-semibold">Stemming</span>
+        </a>
+    </div>
 
-    <a type="button" class="button is-large is-info" href="{{ url_for('search.search') }}">
-        <span class="has-text-weight-semibold">Pencarian</span>
-    </a>
+    <div class="column is-half-tablet is-one-third-desktop">
+        <a type="button" class="button is-large is-info is-fullwidth" href="{{ url_for('search.search') }}">
+            <span class="icon is-small">
+                <i class="fa fa-magnifying-glass"></i>
+            </span>
+            <span class="has-text-weight-semibold">Pencarian</span>
+        </a>
+    </div>
 </div>
+
 {% endblock %}
