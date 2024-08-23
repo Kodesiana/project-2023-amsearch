@@ -20,7 +20,6 @@
 
     <!-- Show search form -->
     <form id="search-form" action="{{ url_for('search.search') }}" method="get">
-      <input type="hidden" value="{{ engine }}" name="engine" />
       <div class="field has-addons">
         <div class="control is-expanded">
           <input id="search-input" type="text" class="input is-large" name="q" value="{{ keyword }}"
@@ -41,11 +40,11 @@
         <div class="column is-narrow">
           <div class="select">
             <select name="stemmer">
-              <option value="ams" {% if engine=='ams' %}selected{% endif %}>AMS</option>
-              <option value="purwoko" {% if engine=='purwoko' %}selected{% endif %}>Purwoko</option>
-              <option value="sastrawi" {% if engine=='sastrawi' %}selected{% endif %}>Sastrawi</option>
-              <option value="ug18" {% if engine=='ug18' %}selected{% endif %}>UG18</option>
-              <option value="none" {% if engine=='none' %}selected{% endif %}>Tanpa stemming</option>
+              <option value="ams" {% if stemmer=='ams' %}selected{% endif %}>AMS</option>
+              <option value="purwoko" {% if stemmer=='purwoko' %}selected{% endif %}>Purwoko</option>
+              <option value="sastrawi" {% if stemmer=='sastrawi' %}selected{% endif %}>Sastrawi</option>
+              <option value="ug18" {% if stemmer=='ug18' %}selected{% endif %}>UG18</option>
+              <option value="none" {% if stemmer=='none' %}selected{% endif %}>Tanpa stemming</option>
             </select>
           </div>
         </div>
@@ -80,13 +79,13 @@
     <!-- Pagination -->
     <div class="is-flex is-justify-content-space-between">
       {% if results.has_prev %}
-      <a class="button" href="{{ url_for('search.search', engine=engine, q=keyword, page=results.page-1 ) }}">Prev</a>
+      <a class="button" href="{{ url_for('search.search', q=keyword, page=results.page-1 ) }}">Prev</a>
       {% else %}
       <div class="is-invisible"></div>
       {% endif %}
 
       {% if results.has_next %}
-      <a class="button" href="{{ url_for('search.search', engine=engine, q=keyword, page=results.page+1 ) }}">Next</a>
+      <a class="button" href="{{ url_for('search.search', q=keyword, page=results.page+1 ) }}">Next</a>
       {% endif %}
     </div>
   </div>
