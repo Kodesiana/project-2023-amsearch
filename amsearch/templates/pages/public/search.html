@@ -65,13 +65,11 @@
       <div class="media-content">
         <div class="content">
           <p>
-            <strong class="subtitle is-4 ">{{ result.title }} </strong> <small>({{ '{:.2f}'.format(result.distance)
-              }})</small>
+            <a href="{{ result.url }}"><strong class="subtitle is-4 ">{{ result.title }}</strong></a> <small>({{'{:.2f}'.format(result.distance)}})</small>
             <br /><br />
             {{ result.excerpt }}
           </p>
         </div>
-
       </div>
     </article>
     {% endfor %}
