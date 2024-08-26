@@ -1,5 +1,43 @@
 {% extends "layouts/default.html" %}
 
+{% block head %}
+<style>
+  [data-tooltip] {
+    text-decoration: underline;
+    text-decoration-style: dotted;
+    text-underline-offset: 5px;
+    white-space: pre-wrap;
+  }
+
+  [data-tooltip]:before {
+    /* required code */
+    content: attr(data-tooltip);
+    position: absolute;
+    opacity: 0;
+
+    /* customizable */
+
+    transition: 256ms all ease;
+    padding: 10px 20px;
+    color: #333;
+    border-radius: 5px;
+    box-shadow: 0px 6px 21px rgb(0 0 0 / 10%);
+  }
+
+  [data-tooltip]:hover:before {
+    /* required code */
+    opacity: 1;
+    display: block;
+
+    /* customizable */
+    background: #fff;
+    border-radius: 5px;
+    border: 1px solid #ccc;
+    top: -30px;
+  }
+</style>
+{% endblock %}
+
 {% block content %}
 <h1 class="subtitle is-2 has-text-centered">Stemming</h1>
 
@@ -94,10 +132,10 @@
     <thead>
       <tr>
         <th>Kata/Token</th>
-        <th>AMS</th>
-        <th>Purwoko</th>
-        <th>Sastrawi</th>
-        <th>UG18</th>
+        <th><span data-tooltip="{{ stats_ams }}">AMS</span></th>
+        <th><span data-tooltip="{{ stats_purwoko }}">Purwoko</span></th>
+        <th><span data-tooltip="{{ stats_sastwawi }}">Sastrawi</span></th>
+        <th><span data-tooltip="{{ stats_ug18 }}">UG18</span></th>
       </tr>
     </thead>
     <tbody>

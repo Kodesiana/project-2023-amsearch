@@ -1,6 +1,7 @@
 from dataclasses import dataclass
 
-from flask import Blueprint, render_template, flash, request
+import numpy as np
+from flask import Blueprint, render_template, request
 
 from amsearch.services import VectorSearchInstance
 
@@ -15,6 +16,15 @@ class StemResult:
 
 
 router = Blueprint("stemming", __name__)
+
+
+def stats_description(stem_stats, prefix, total_unique):
+    return "Jumlah kata stemming: {0}\nJumlah kata unik: {1}\nJumlah kata benar: {2}\n Akurasi: {3:.2f}%".format(
+        stem_stats[f"stemmed_{prefix}"],
+        total_unique,
+        stem_stats[f"correct_{prefix}"],
+        stem_stats[f"accuracy_{prefix}"],
+    )
 
 
 @router.route("/stemming", methods=["GET", "POST"])
@@ -36,7 +46,8 @@ def stem():
     tokens = set(
         [word.strip().lower() for word in VectorSearchInstance.tokenize(input_text)]
     )
-    stems = [
+
+    stems: list[StemResult] = [
         StemResult(
             original=word,
             ams=VectorSearchInstance.stemmer.stem_ams(word),
@@ -47,12 +58,48 @@ def stem():
         for word in tokens
     ]
 
+    stem_stats = {
+        "stemmed_ams": np.sum([res.original != res.ams for res in stems]),
+        "stemmed_purwoko": np.sum([res.original != res.purwoko for res in stems]),
+        "stemmed_sastrawi": np.sum([res.original != res.sastrawi for res in stems]),
+        "stemmed_ug18": np.sum([res.original != res.ug18 for res in stems]),
+        "correct_ams": np.sum(
+            [x.ams in VectorSearchInstance.stemmer.kamus for x in stems]
+        ),
+        "correct_purwoko": np.sum(
+            [x.purwoko in VectorSearchInstance.stemmer.kamus for x in stems]
+        ),
+        "correct_sastrawi": np.sum(
+            [x.sastrawi in VectorSearchInstance.stemmer.kamus for x in stems]
+        ),
+        "correct_ug18": np.sum(
+            [x.ug18 in VectorSearchInstance.stemmer.kamus for x in stems]
+        ),
+    }
+
+    # calculate true positives
+    stem_stats = {
+        **stem_stats,
+        "accuracy_ams": stem_stats["correct_ams"] / len(stems) * 100,
+        "accuracy_purwoko": stem_stats["correct_purwoko"] / len(stems) * 100,
+        "accuracy_sastrawi": stem_stats["correct_sastrawi"] / len(stems) * 100,
+        "accuracy_ug18": stem_stats["correct_ug18"] / len(stems) * 100,
+    }
+
     return render_template(
         "pages/public/stemming.html",
+        # input text
         input_text=input_text,
+        # sentence stemming
         output_ams=VectorSearchInstance.stem_sentence(input_text, "ams")[0],
         output_purwoko=VectorSearchInstance.stem_sentence(input_text, "purwoko")[0],
         output_sastrawi=VectorSearchInstance.stem_sentence(input_text, "sastrawi")[0],
         output_ug18=VectorSearchInstance.stem_sentence(input_text, "ug18")[0],
+        # per word stems
         stems=stems,
+        # statistics
+        stats_ams=stats_description(stem_stats, "ams", len(stems)),
+        stats_purwoko=stats_description(stem_stats, "purwoko", len(stems)),
+        stats_sastwawi=stats_description(stem_stats, "sastrawi", len(stems)),
+        stats_ug18=stats_description(stem_stats, "ug18", len(stems)),
     )
