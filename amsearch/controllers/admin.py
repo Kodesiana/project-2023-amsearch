@@ -9,11 +9,13 @@ from amsearch.db import db, Document
 
 router = Blueprint("admin", __name__)
 
+
 def get_paginated_documents(search_term: Optional[str] = None, per_page: int = 10):
     query = db.select(Document).order_by(Document.published_at.desc())
     if search_term:
         query = query.filter(Document.title.ilike(f"%{search_term}%"))
     return db.paginate(query, per_page=per_page)
+
 
 @router.route("/admin")
 @login_required
@@ -24,10 +26,12 @@ def list():
         "pages/admin/list.html", pagination=pagination, search_term=search_term
     )
 
+
 @router.route("/admin/create")
 @login_required
 def create():
     return render_template("pages/admin/edit.html")
+
 
 @router.route("/admin/edit/<string:id>")
 @login_required
@@ -42,6 +46,7 @@ def update(id: str):
         published_at=doc.published_at,
     )
 
+
 @router.route("/admin/remove/<string:id>")
 @login_required
 def remove(id: str):
@@ -55,14 +60,17 @@ def remove(id: str):
         flash(f"Gagal menghapus dokumen: {str(e)}", "danger")
     return redirect(url_for("admin.list"))
 
+
 @router.route("/admin/save", methods=["POST"])
 @login_required
 def save():
     form_data = request.form.to_dict()
-    id = form_data.pop('id', None)
+    id = form_data.pop("id", None)
 
     try:
-        content_stemmed, count = VectorSearchInstance.stem_sentence(form_data['content'], "ams")
+        content_stemmed, count = VectorSearchInstance.stem_sentence(
+            form_data["content"], "ams"
+        )
         embedding = VectorSearchInstance.embed(content_stemmed)
 
         if id:
@@ -80,7 +88,9 @@ def save():
             db.session.add(doc)
         db.session.commit()
 
-        flash(f"Data berhasil ditambahkan!<br><strong>{ doc.title }</strong>", "success")
+        flash(
+            f"Data berhasil ditambahkan!<br><strong>{ doc.title }</strong>", "success"
+        )
         return redirect(url_for("admin.list"))
     except SQLAlchemyError as e:
         db.session.rollback()
