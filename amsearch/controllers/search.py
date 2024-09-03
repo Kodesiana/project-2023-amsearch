@@ -17,7 +17,7 @@ STEMMER_DESC = {
 @router.route("/search")
 def search():
     # get search engine
-    stemmer = request.args.get("stemmer", "none")
+    stemmer = request.args.get("stemmer", "ams")
     if stemmer not in AVAILABLE_STEMMER:
         stemmer = "none"
 
@@ -41,7 +41,7 @@ def search():
 
     return render_template(
         "pages/public/search.html",
-        stemmer=STEMMER_DESC[stemmer],
+        stemmer=stemmer,
         keyword=q,
         execution_time=f"{results.execution_time:.2f}",
         results=results,
