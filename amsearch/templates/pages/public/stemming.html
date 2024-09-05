@@ -45,18 +45,24 @@
   <div class="card">
     <div class="card-content">
 
-      <!-- File Selector -->
-      <div class="file has-name mb-4">
-        <label class="file-label">
-          <input id="input-file" class="file-input" type="file" name="input-file" accept="text/plain" />
-          <span class="file-cta">
-            <span class="file-icon">
-              <i class="fas fa-upload"></i>
+      <!-- Top Buttons -->
+      <div class="is-flex mb-4">
+        <!-- File Selector -->
+        <div class="file has-name mb-0 mr-4">
+          <label class="file-label">
+            <input id="input-file" class="file-input" type="file" name="input-file" accept="text/plain" />
+            <span class="file-cta">
+              <span class="file-icon">
+                <i class="fas fa-upload"></i>
+              </span>
+              <span class="file-label"> Pilih berkas TXT... </span>
             </span>
-            <span class="file-label"> Pilih berkas TXT... </span>
-          </span>
-          <span id="input-file-name" class="file-name"> Belum ada file TXT dipilih </span>
-        </label>
+            <span id="input-file-name" class="file-name"> Belum ada file TXT dipilih </span>
+          </label>
+        </div>
+
+        <!-- Stem per word -->
+        <a class="button is-info" href="{{ url_for('stemming.stem_word') }}">Stemming per Kata</a>
       </div>
 
       <!-- Input Text -->
@@ -70,6 +76,7 @@
           </button>
         </div>
       </div>
+
     </div>
   </div>
 </form>

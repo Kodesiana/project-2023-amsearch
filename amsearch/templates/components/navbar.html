@@ -4,7 +4,6 @@
       <img src="/static/logo-hd.png" height="48">
     </a>
 
-
     <a role="button" class="navbar-burger" data-target="navMenu" aria-label="menu" aria-expanded="false">
       <span aria-hidden="true"></span>
       <span aria-hidden="true"></span>
@@ -17,6 +16,10 @@
     <div class="navbar-end">
       <a class="navbar-item" blocking="render" rel="expect" href="{{ url_for('stemming.stem') }}">
         Stemming
+      </a>
+
+      <a class="navbar-item" blocking="render" rel="expect" href="{{ url_for('stemming.stem_word') }}">
+        Stemming Kata
       </a>
 
       <a class="navbar-item" blocking="render" rel="expect" href="{{ url_for('search.search') }}">

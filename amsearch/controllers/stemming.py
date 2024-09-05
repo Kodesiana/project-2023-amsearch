@@ -1,6 +1,7 @@
 from dataclasses import dataclass
 
 import numpy as np
+from thefuzz import process
 from flask import Blueprint, render_template, request
 
 from amsearch.services import VectorSearchInstance
@@ -103,3 +104,31 @@ def stem():
         stats_sastwawi=stats_description(stem_stats, "sastrawi", len(stems)),
         stats_ug18=stats_description(stem_stats, "ug18", len(stems)),
     )
+
+@router.route("/stemming_word", methods=["GET", "POST"])
+def stem_word():
+    # show page
+    if request.method == "GET":
+        return render_template(
+            "pages/public/stemming_single.html", input_word="", stemmed_word="", alternatives=[]
+        )
+
+    # get text
+    input_word = request.form.get("input-word")
+    if not input_word:
+        return render_template(
+            "pages/public/stemming_single.html", input_word="", stemmed_word="", alternatives=[]
+        )
+    
+    # stem the word
+    stemmed_word = VectorSearchInstance.stemmer.stem_ams(input_word.lower())
+
+    # find alternative if the word is not in the dictionary
+    alternatives = []
+    if stemmed_word not in VectorSearchInstance.stemmer.kamus:
+        alternatives = process.extract(stemmed_word, VectorSearchInstance.stemmer.kamus, limit=5)
+
+    # render page
+    return render_template(
+            "pages/public/stemming_single.html", input_word=input_word, stemmed_word=stemmed_word, alternatives=alternatives
+        )

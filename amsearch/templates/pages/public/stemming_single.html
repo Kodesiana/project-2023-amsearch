@@ -1,0 +1,69 @@
+{% extends "layouts/default.html" %}
+
+{% block content %}
+<h1 class="subtitle is-2 has-text-centered">Stemming per Kata</h1>
+
+<form id="stemming-form" action="{{ url_for('stemming.stem_word') }}" method="post" class="mb-4">
+    <div class="card">
+        <div class="card-content">
+            <!-- Input Text -->
+            <input id="input-word" name="input-word" class="input" placeholder="Input kata" value="{{ input_word }}">
+
+            <div class="columns is-centered mt-4">
+                <div class="column is-half is-full-mobile">
+                    <button id="submit-button" type="submit" class="button is-medium is-dark is-fullwidth" disabled>
+                        <span class="has-text-weight-semibold">Proses Stemming</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</form>
+
+{% if input_word %}
+<div class="card">
+    <header class="card-header">
+        <p class="card-header-title">Hasil Stemming AMS</p>
+    </header>
+    <div class="card-content">
+        <p class="subtitle is-4 has-text-centered">Kata asli: <span class="tag is-info is-large">{{ input_word }}</span></p>
+        <p class="subtitle is-4 has-text-centered">Kata stemming: <span class="tag is-success is-large">{{ stemmed_word }}</span></p>
+        {% if alternatives %}
+        <p class="subtitle is-4 has-text-centered">Pencarian Anda "{{ stemmed_word }}" tidak ditemukan. Mungkin Anda mencari kata:</p>
+        <div class="is-flex is-justify-content-center">
+            <div class="field is-grouped is-grouped-multiline">
+                {% for word, similarity in alternatives %}
+                <div class="control">
+                    <div class="tags has-addons">
+                        <p class="tag is-large is-link">{{ word }}</p>
+                        <p class="tag is-large is-dark">{{ similarity }}</p>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endif %}
+{% endblock %}
+
+
+{% block script %}
+{{ super() }}
+
+<script>
+    addEventListener("DOMContentLoaded", () => {
+        const inputWord = document.getElementById("input-word");
+        const submitButton = document.getElementById("submit-button");
+
+        // Function to toggle the submit button state
+        const toggleSubmitButton = () => {
+            submitButton.disabled = inputWord.value.trim().length === 0;
+        };
+
+        // Textarea input event
+        inputWord.addEventListener("input", toggleSubmitButton);
+    });
+</script>
+{% endblock %}
