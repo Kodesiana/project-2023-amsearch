@@ -19,6 +19,7 @@
     <h4 class="subtitle is-3">Dataset</h4>
     <div class="columns is-mobile">
       <div class="column is-narrow">
+        <!-- Search -->
         <form action="{{ url_for('admin.list') }}" method="get">
           <div class="field has-addons">
             <div class="control is-expanded">
@@ -32,12 +33,21 @@
           </div>
         </form>
       </div>
+      <!-- Right Buttons -->
       <div class="column is-narrow">
+        <!-- Add -->
         <a class="button is-link" href="{{ url_for('admin.create') }}">
           <span class="icon">
             <i class="fa fa-plus"></i>
           </span>
           <span>Tambah</span>
+        </a>
+        <!-- Download -->
+        <a class="button is-link" href="{{ url_for('admin.download') }}">
+          <span class="icon">
+            <i class="fa fa-download"></i>
+          </span>
+          <span>Unduh</span>
         </a>
       </div>
     </div>

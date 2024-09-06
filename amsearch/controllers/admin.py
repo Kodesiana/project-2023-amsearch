@@ -1,5 +1,8 @@
+import csv
 import uuid
+from io import StringIO
 from typing import Optional
+
 from flask import Blueprint, flash, render_template, redirect, url_for, request
 from flask_login import login_required
 from sqlalchemy.exc import SQLAlchemyError
@@ -99,3 +102,47 @@ def save():
         flash(f"Kesalahan tidak diketahui: {str(e)}", "danger")
 
     return render_template("pages/admin/edit.html", **form_data)
+
+
+@router.route("/admin/download")
+@login_required
+def download():
+    # create in-memory storage
+    si = StringIO()
+
+    # create csv writer
+    cw = csv.writer(si)
+
+    # get all documents
+    rows = db.session.execute(
+        db.select(
+            Document.id,
+            Document.title,
+            Document.content,
+            Document.source_url,
+            Document.token_count,
+            Document.published_at,
+        )
+    ).all()
+
+    # write header
+    cw.writerow(["id", "title", "content", "source_url", "token_count", "published_at"])
+
+    # print each row
+    for row in rows:
+        cw.writerow(
+            [
+                row.id,
+                row.title,
+                row.content,
+                row.source_url,
+                row.token_count,
+                row.published_at,
+            ]
+        )
+
+    # return generator and header
+    return si.getvalue(), {
+        "Content-Type": "text/csv",
+        "Content-Disposition": "attachment; filename=artikel-sunda.csv",
+    }
