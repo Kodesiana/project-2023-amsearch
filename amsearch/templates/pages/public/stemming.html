@@ -133,16 +133,22 @@
     </div>
   </div>
 </div>
+
+<!-- Stemming Statistics -->
+<div class="card p-5" style="height: 300px;">
+  <canvas id="stats-tokens-chart"></canvas>
+</div>
+
+<!-- Stemming per Word/Token -->
 <div class="card">
-  <!-- Stemming per Word/Token -->
-  <table class="table is-striped is-hoverable is-fullwidth mb-2" style="border-radius: var(--bulma-card-radius);">
+  <table class="table is-striped is-hoverable is-fullwidth mb-2" style="border-radius: var(--bulma-card-radius); max-height: 300px;">
     <thead>
       <tr>
         <th>Kata/Token</th>
-        <th><span data-tooltip="{{ stats_ams }}">AMS</span></th>
-        <th><span data-tooltip="{{ stats_purwoko }}">Purwoko</span></th>
-        <th><span data-tooltip="{{ stats_sastwawi }}">Sastrawi</span></th>
-        <th><span data-tooltip="{{ stats_ug18 }}">UG18</span></th>
+        <th>AMS</th>
+        <th>Purwoko</th>
+        <th>Sastrawi</th>
+        <th>UG18</th>
       </tr>
     </thead>
     <tbody>
@@ -199,6 +205,57 @@
 
     // Textarea input event
     inputText.addEventListener("input", toggleSubmitButton);
+
+    // charts
+    new Chart(document.getElementById('stats-tokens-chart'), {
+      type: 'bar',
+      data: {
+        labels: ['AMS', 'Purwoko', 'Sastrawi', 'UG18'],
+        datasets: [
+          {
+            label: 'Token di-stemming',
+            data: JSON.parse("{{ stats_stemmed_tokens }}"),
+            yAxisID: 'y',
+          },
+          {
+            label: 'Token benar',
+            data: JSON.parse("{{ stats_correct_tokens }}"),
+            yAxisID: 'y',
+          },
+          {
+            label: 'Akurasi',
+            data: JSON.parse("{{ stats_accuracy }}"),
+            type: 'line',
+            yAxisID: 'y2',
+          },
+        ]
+      },
+      options: {
+        maintainAspectRatio: false,
+        scales: {
+          y: {
+            beginAtZero: true,
+            position: 'left',
+            title: {
+              display: true,
+              text: "Jumlah token"
+            },
+          },
+          y2: {
+            beginAtZero: true,
+            position: 'right',
+            title: {
+              display: true,
+              text: "Akurasi (%)"
+            },
+            grid: {
+              drawOnChartArea: false
+            }
+          },
+        }
+      }
+    });
+
   });
 </script>
 {% endblock %}
