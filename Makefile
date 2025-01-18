@@ -8,6 +8,6 @@ dev:
 
 build:
 	docker build -t fahminlb33/project-2023-amsearch:v${IMAGE_VERSION} amsearch
-	docker push -t fahminlb33/project-2023-amsearch:v${IMAGE_VERSION}
+	docker push fahminlb33/project-2023-amsearch:v${IMAGE_VERSION}
 
 .PHONY: format dev
