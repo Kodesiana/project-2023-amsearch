@@ -1,7 +1,7 @@
 IMAGE_VERSION=$(file < VERSION)
 
 format:
-	yapf -i -r -vv --style=pep8 .
+	ruff format .
 
 dev:
 	flask --app amsearch run --reload --debug
