@@ -19,7 +19,7 @@ def search():
     # get search engine
     stemmer = request.args.get("stemmer", "ams")
     if stemmer not in AVAILABLE_STEMMER:
-        stemmer = "none"
+        stemmer = "ams"
 
     # get keyword
     q = request.args.get("q", "")

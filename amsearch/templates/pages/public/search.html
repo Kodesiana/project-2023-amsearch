@@ -37,17 +37,6 @@
           <p class="mt-2 mb-4">Ditemukan {{ '{:,}'.format(results.total) }} dokumen. Lama eksekusi
             {{ execution_time }} detik.</p>
         </div>
-        <div class="column is-narrow">
-          <div class="select">
-            <select name="stemmer">
-              <option value="ams" {% if stemmer=='ams' %}selected{% endif %}>AMS</option>
-              <option value="purwoko" {% if stemmer=='purwoko' %}selected{% endif %}>Purwoko</option>
-              <option value="sastrawi" {% if stemmer=='sastrawi' %}selected{% endif %}>Sastrawi</option>
-              <option value="ug18" {% if stemmer=='ug18' %}selected{% endif %}>UG18</option>
-              <option value="none" {% if stemmer=='none' %}selected{% endif %}>Tanpa stemming</option>
-            </select>
-          </div>
-        </div>
       </div>
     </form>
     {% endif %}
