@@ -1,8 +1,8 @@
-import os
 import time
 from dataclasses import dataclass
 
 from sqlalchemy import func
+from thefuzz import process
 from sentence_transformers import SentenceTransformer
 
 from amsearch.db import db, Document
@@ -35,9 +35,9 @@ LIMIT_DISTANCE = 1
 
 
 class SearchService:
-    def load(self, data_dir: str):
-        self.stemmer = Stemmer(data_dir)
-        self.bert = SentenceTransformer.load(os.path.join(data_dir, "bert-sunda-ams"))
+    def load(self, vocab_path: str, embedding_model_path: str):
+        self.stemmer = Stemmer(vocab_path)
+        self.model = SentenceTransformer.load(embedding_model_path)
 
     def search(
         self, stemmer: str, q: str, page: int = 0, per_page: int = 10
@@ -46,16 +46,14 @@ class SearchService:
         stemmed, _ = self.stem_sentence(q, stemmer)
 
         # extract embeddings
-        embedding = self.bert.encode([stemmed])[0]
-        distance_col = Document.embedding_bert.cosine_distance(embedding).label(
+        embedding = self.model.encode([stemmed])[0]
+        distance_col = Document.embedding_ams.cosine_distance(embedding).label(
             "distance"
         )
 
         # build query
         rows_query = (
-            db.select(
-                Document.title, Document.source_url, Document.content, distance_col
-            )
+            db.select(Document.title, Document.source, Document.content_ams, distance_col)
             .where(distance_col < LIMIT_DISTANCE)
             .order_by(distance_col)
             .limit(per_page)
@@ -98,7 +96,7 @@ class SearchService:
         )
 
     def embed(self, text: str):
-        return self.bert.encode([text])[0]
+        return self.model.encode([text])[0]
 
     def stem_sentence(self, sentence: str, stemmer: str) -> tuple[str, int]:
         if stemmer == "ams":
@@ -125,6 +123,9 @@ class SearchService:
             stems = tokenize(sentence)
 
         return " ".join(stems), len(stems)
+    
+    def extract_fuzzy_alternatives(self, *args, **kwargs):
+        return process.extract(*args, **kwargs)
 
     def __truncate_contents(self, contents: str, max_length: int = 200) -> str:
         if len(contents) > max_length:
@@ -133,4 +134,4 @@ class SearchService:
             return contents
 
 
-VectorSearchInstance = SearchService()
+IR = SearchService()

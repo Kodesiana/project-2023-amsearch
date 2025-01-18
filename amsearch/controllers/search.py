@@ -1,6 +1,6 @@
-from flask import Blueprint, render_template, flash, request
+from flask import Blueprint, render_template, request
 
-from amsearch.services import EMPTY_RESULT, VectorSearchInstance
+from amsearch.services import EMPTY_RESULT, IR
 
 router = Blueprint("search", __name__)
 
@@ -37,7 +37,7 @@ def search():
     per_page = request.args.get("per_page", 10, type=int)
 
     # run search
-    results = VectorSearchInstance.search(stemmer, q, page, per_page)
+    results = IR.search(stemmer, q, page, per_page)
 
     return render_template(
         "pages/public/search.html",

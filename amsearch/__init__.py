@@ -2,7 +2,7 @@ from flask import Flask, render_template
 
 from amsearch.db import db, User
 from amsearch.login import lm
-from amsearch.services import VectorSearchInstance
+from amsearch.services import IR
 
 # create and configure the app
 app = Flask(__name__)
@@ -22,7 +22,7 @@ def load_user(user_id):
 
 
 # load stemmers and embedding models
-VectorSearchInstance.load(app.config["DATA_DIR"])
+IR.load(app.config["VOCAB_PATH"], app.config["MODEL_PATH"])
 
 # register blueprints
 from amsearch.controllers import auth, admin, search, stemming, statistics

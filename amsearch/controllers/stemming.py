@@ -1,10 +1,8 @@
 from dataclasses import dataclass
 
-import numpy as np
-from thefuzz import process
 from flask import Blueprint, render_template, request
 
-from amsearch.services import VectorSearchInstance
+from amsearch.services import IR
 
 
 @dataclass
@@ -45,34 +43,34 @@ def stem():
 
     # split tokens
     tokens = set(
-        [word.strip().lower() for word in VectorSearchInstance.tokenize(input_text)]
+        [word.strip().lower() for word in IR.tokenize(input_text)]
     )
 
     # perform stemming
     stems: list[StemResult] = [
         StemResult(
             original=word,
-            ams=VectorSearchInstance.stemmer.stem_ams(word),
-            purwoko=VectorSearchInstance.stemmer.stem_purwoko(word),
-            sastrawi=VectorSearchInstance.stemmer.stem_sastrawi(word),
-            ug18=VectorSearchInstance.stemmer.stem_ug18(word),
+            ams=IR.stemmer.stem_ams(word),
+            purwoko=IR.stemmer.stem_purwoko(word),
+            sastrawi=IR.stemmer.stem_sastrawi(word),
+            ug18=IR.stemmer.stem_ug18(word),
         )
         for word in tokens
     ]
 
     # calculate statistics
     stats_stemmed_tokens = [
-        np.sum([res.original != res.ams for res in stems]),
-        np.sum([res.original != res.purwoko for res in stems]),
-        np.sum([res.original != res.sastrawi for res in stems]),
-        np.sum([res.original != res.ug18 for res in stems]),
+        sum([res.original != res.ams for res in stems]),
+        sum([res.original != res.purwoko for res in stems]),
+        sum([res.original != res.sastrawi for res in stems]),
+        sum([res.original != res.ug18 for res in stems]),
     ]
 
     stats_correct_tokens = [
-        np.sum([x.ams in VectorSearchInstance.stemmer.kamus for x in stems]),
-        np.sum([x.purwoko in VectorSearchInstance.stemmer.kamus for x in stems]),
-        np.sum([x.sastrawi in VectorSearchInstance.stemmer.kamus for x in stems]),
-        np.sum([x.ug18 in VectorSearchInstance.stemmer.kamus for x in stems]),
+        sum([x.ams in IR.stemmer.kamus for x in stems]),
+        sum([x.purwoko in IR.stemmer.kamus for x in stems]),
+        sum([x.sastrawi in IR.stemmer.kamus for x in stems]),
+        sum([x.ug18 in IR.stemmer.kamus for x in stems]),
     ]
 
     # WARN: add 5 to AMS result from the most correct stemming
@@ -85,10 +83,10 @@ def stem():
         # input text
         input_text=input_text,
         # sentence stemming
-        output_ams=VectorSearchInstance.stem_sentence(input_text, "ams")[0],
-        output_purwoko=VectorSearchInstance.stem_sentence(input_text, "purwoko")[0],
-        output_sastrawi=VectorSearchInstance.stem_sentence(input_text, "sastrawi")[0],
-        output_ug18=VectorSearchInstance.stem_sentence(input_text, "ug18")[0],
+        output_ams=IR.stem_sentence(input_text, "ams")[0],
+        output_purwoko=IR.stem_sentence(input_text, "purwoko")[0],
+        output_sastrawi=IR.stem_sentence(input_text, "sastrawi")[0],
+        output_ug18=IR.stem_sentence(input_text, "ug18")[0],
         # per word stems
         stems=stems,
         # statistics
@@ -120,13 +118,13 @@ def stem_word():
         )
 
     # stem the word
-    stemmed_word = VectorSearchInstance.stemmer.stem_ams(input_word.lower())
+    stemmed_word = IR.stemmer.stem_ams(input_word.lower())
 
     # find alternative if the word is not in the dictionary
     alternatives = []
-    if stemmed_word not in VectorSearchInstance.stemmer.kamus:
-        alternatives = process.extract(
-            stemmed_word, VectorSearchInstance.stemmer.kamus, limit=5
+    if stemmed_word not in IR.stemmer.kamus:
+        alternatives = IR.extract_fuzzy_alternatives(
+            stemmed_word, IR.stemmer.kamus, limit=5
         )
 
     # render page

@@ -7,8 +7,8 @@ from flask import Blueprint, flash, render_template, redirect, url_for, request
 from flask_login import login_required
 from sqlalchemy.exc import SQLAlchemyError
 
-from amsearch.services import VectorSearchInstance
 from amsearch.db import db, Document
+from amsearch.services import IR
 
 router = Blueprint("admin", __name__)
 
@@ -17,6 +17,7 @@ def get_paginated_documents(search_term: Optional[str] = None, per_page: int = 1
     query = db.select(Document).order_by(Document.published_at.desc())
     if search_term:
         query = query.filter(Document.title.ilike(f"%{search_term}%"))
+        
     return db.paginate(query, per_page=per_page)
 
 
@@ -44,8 +45,8 @@ def update(id: str):
         "pages/admin/edit.html",
         id=id,
         title=doc.title,
-        content=doc.content,
-        url=doc.source_url,
+        content=doc.content_raw,
+        url=doc.source,
         published_at=doc.published_at,
     )
 
@@ -71,11 +72,7 @@ def save():
     id = form_data.pop("id", None)
 
     try:
-        content_stemmed, count = VectorSearchInstance.stem_sentence(
-            form_data["content"], "ams"
-        )
-        embedding = VectorSearchInstance.embed(content_stemmed)
-
+        # if we're editing, set the ID. Otherwise, generate one
         if id:
             doc = db.get_or_404(Document, id)
             for key, value in form_data.items():
@@ -83,14 +80,26 @@ def save():
         else:
             doc = Document(id=str(uuid.uuid4()), **form_data)
 
-        doc.content = content_stemmed
-        doc.token_count = count
-        doc.embedding_bert = doc.embedding_tfidf = embedding
+        # perform stemming
+        content_stem, token_count = IR.stem_sentence(
+            form_data["content"], "ams"
+        )
 
+        # set record values
+        doc.word_count = token_count
+        doc.content_ams = content_stem
+        doc.content_raw = form_data["content"]
+        doc.embedding_ams = IR.embed(content_stem)
+        doc.embedding_raw = IR.embed(form_data["content"])
+
+        # add new record
         if not id:
             db.session.add(doc)
+
+        # save to db
         db.session.commit()
 
+        # redirect to admin page
         flash(
             f"Data berhasil ditambahkan!<br><strong>{ doc.title }</strong>", "success"
         )
@@ -118,9 +127,9 @@ def download():
         db.select(
             Document.id,
             Document.title,
-            Document.content,
-            Document.source_url,
-            Document.token_count,
+            Document.content_ams,
+            Document.source,
+            Document.word_count,
             Document.published_at,
         )
     ).all()
@@ -134,8 +143,8 @@ def download():
             [
                 row.id,
                 row.title,
-                row.content,
-                row.source_url,
+                row.content_ams,
+                row.source,
                 row.token_count,
                 row.published_at,
             ]

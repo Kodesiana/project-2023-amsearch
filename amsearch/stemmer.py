@@ -1,4 +1,3 @@
-import os
 import re
 
 from Sastrawi.Stemmer.StemmerFactory import StemmerFactory
@@ -9,9 +8,8 @@ def tokenize(text: str) -> list[str]:
 
 
 class Stemmer:
-    def __init__(self, data_dir: str):
+    def __init__(self, vocab_sunda_path: str):
         # load vocabulary
-        vocab_sunda_path = os.path.join(data_dir, "vocab.txt")
         with open(vocab_sunda_path) as word_file:
             self.kamus = set(word.strip().lower() for word in word_file)
 

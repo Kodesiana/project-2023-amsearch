@@ -1,11 +1,9 @@
 from dataclasses import dataclass
 
 from sqlalchemy import text
-
-from flask import Blueprint, render_template, flash, request
+from flask import Blueprint, render_template, flash
 from flask_login import login_required
 
-from amsearch.services import VectorSearchInstance
 from amsearch.db import db
 
 
