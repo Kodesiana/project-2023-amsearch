@@ -1,6 +1,9 @@
 # pull base image
 FROM python:3.11-bookworm AS base
 
+# install uv
+COPY --from=ghcr.io/astral-sh/uv:latest /uv /uvx /bin/
+
 # set work directory
 WORKDIR /usr/app
 
@@ -11,7 +14,7 @@ RUN apt-get update \
 
 # install python dependencies
 COPY requirements.txt .
-RUN pip install --no-cache-dir -r requirements.txt --index-url https://download.pytorch.org/whl/cpu --extra-index-url https://pypi.org/simple
+RUN uv pip install --system --no-cache -r requirements.txt --index-strategy unsafe-best-match --index https://download.pytorch.org/whl/cpu
 
 # create prod image
 FROM base AS prod
