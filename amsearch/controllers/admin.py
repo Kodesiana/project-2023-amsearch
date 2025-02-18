@@ -144,10 +144,10 @@ def download():
         select(
             Document.id,
             Document.title,
+            DocumentRaw.content,
             Document.source_url,
             Document.word_count,
             Document.published_at,
-            DocumentRaw.content,
         ).join(Document.raw)
     ).all()
 
@@ -155,17 +155,11 @@ def download():
     cw.writerow(["id", "title", "content", "source_url", "word_count", "published_at"])
 
     # print each row
-    for row in rows:
-        cw.writerow(
-            [
-                row.id,
-                row.title,
-                row.content,
-                row.source,
-                row.word_count,
-                row.published_at,
-            ]
-        )
+    def gen_rows():
+        for row in rows:
+            yield [row[0], row[1], row[2], row[3], row[4], row[5]]
+
+    cw.writerows(gen_rows())
 
     # return generator and header
     return si.getvalue(), {

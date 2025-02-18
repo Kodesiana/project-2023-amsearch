@@ -36,8 +36,12 @@ class Document(db.Model):
     source_url: Mapped[Optional[str]]
     published_at: Mapped[date]
 
-    raw: Mapped["DocumentRaw"] = relationship(back_populates="parent")
-    stem: Mapped["DocumentStem"] = relationship(back_populates="parent")
+    raw: Mapped["DocumentRaw"] = relationship(
+        back_populates="parent", cascade="all, delete"
+    )
+    stem: Mapped["DocumentStem"] = relationship(
+        back_populates="parent", cascade="all, delete"
+    )
 
 
 class DocumentRaw(db.Model):
