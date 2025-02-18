@@ -4,7 +4,11 @@ from Sastrawi.Stemmer.StemmerFactory import StemmerFactory
 
 
 def tokenize(text: str) -> list[str]:
-    return re.findall("\w+(?:-\w+)*", text)
+    return [x.strip().lower() for x in re.findall("\w+(?:-\w+)*", text)]
+
+
+def word_count(text: str) -> int:
+    return len(tokenize(text))
 
 
 class Stemmer:

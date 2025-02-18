@@ -3,21 +3,23 @@ import uuid
 from io import StringIO
 from typing import Optional
 
-from flask import Blueprint, flash, render_template, redirect, url_for, request
-from flask_login import login_required
+from sqlalchemy import select
 from sqlalchemy.exc import SQLAlchemyError
+from flask_login import login_required
+from flask import Blueprint, abort, flash, render_template, redirect, url_for, request
 
-from amsearch.db import db, Document
+from amsearch.db import db, Document, DocumentRaw, DocumentStem
 from amsearch.services import IR
+from amsearch.stemmer import word_count
 
 router = Blueprint("admin", __name__)
 
 
 def get_paginated_documents(search_term: Optional[str] = None, per_page: int = 10):
-    query = db.select(Document).order_by(Document.published_at.desc())
+    query = select(Document).join(Document.raw).order_by(Document.published_at.desc())
     if search_term:
         query = query.filter(Document.title.ilike(f"%{search_term}%"))
-        
+
     return db.paginate(query, per_page=per_page)
 
 
@@ -40,14 +42,19 @@ def create():
 @router.route("/admin/edit/<string:id>")
 @login_required
 def update(id: str):
-    doc = db.get_or_404(Document, id)
+    doc = db.session.execute(
+        select(Document).join(Document.raw).filter(Document.id == id)
+    ).one_or_none()
+    if doc is None:
+        abort(404)
+
     return render_template(
         "pages/admin/edit.html",
         id=id,
-        title=doc.title,
-        content=doc.content_raw,
-        url=doc.source,
-        published_at=doc.published_at,
+        title=doc[0].title,
+        content=doc[0].raw.content,
+        source_url=doc[0].source_url,
+        published_at=doc[0].published_at,
     )
 
 
@@ -58,7 +65,8 @@ def remove(id: str):
         doc = db.get_or_404(Document, id)
         db.session.delete(doc)
         db.session.commit()
-        flash(f"Data berhasil dihapus!<br><strong>{ doc.title }</strong>", "success")
+
+        flash(f"Data berhasil dihapus!<br><strong>{doc.title}</strong>", "success")
     except SQLAlchemyError as e:
         db.session.rollback()
         flash(f"Gagal menghapus dokumen: {str(e)}", "danger")
@@ -75,22 +83,32 @@ def save():
         # if we're editing, set the ID. Otherwise, generate one
         if id:
             doc = db.get_or_404(Document, id)
-            for key, value in form_data.items():
-                setattr(doc, key, value)
         else:
-            doc = Document(id=str(uuid.uuid4()), **form_data)
+            doc = Document(id=str(uuid.uuid4()))
+
+        # create fields
+        if doc.raw is None:
+            doc.raw = DocumentRaw(id=str(uuid.uuid4()))
+
+        if doc.stem is None:
+            doc.stem = DocumentStem(id=str(uuid.uuid4()))
 
         # perform stemming
-        content_stem, token_count = IR.stem_sentence(
-            form_data["content"], "ams"
-        )
+        content_stem = IR.stem_sentence(form_data["content"], "ams")
 
         # set record values
-        doc.word_count = token_count
-        doc.content_ams = content_stem
-        doc.content_raw = form_data["content"]
-        doc.embedding_ams = IR.embed(content_stem)
-        doc.embedding_raw = IR.embed(form_data["content"])
+        doc.title = form_data["title"]
+        doc.word_count = word_count(form_data["content"])
+        doc.source_url = form_data["source_url"]
+        doc.published_at = form_data["published_at"]
+
+        doc.raw.title = form_data["title"]
+        doc.raw.content = form_data["content"]
+        doc.raw.embedding = IR.embed(form_data["content"])
+
+        doc.stem.title = form_data["title"]
+        doc.stem.content = content_stem
+        doc.stem.embedding = IR.embed(content_stem)
 
         # add new record
         if not id:
@@ -100,11 +118,10 @@ def save():
         db.session.commit()
 
         # redirect to admin page
-        flash(
-            f"Data berhasil ditambahkan!<br><strong>{ doc.title }</strong>", "success"
-        )
+        flash(f"Data berhasil ditambahkan!<br><strong>{doc.title}</strong>", "success")
         return redirect(url_for("admin.list"))
     except SQLAlchemyError as e:
+        print(e)
         db.session.rollback()
         flash(f"Data gagal disimpan!<br>Pastikan semua kolom sudah diisi.", "danger")
     except Exception as e:
@@ -124,18 +141,18 @@ def download():
 
     # get all documents
     rows = db.session.execute(
-        db.select(
+        select(
             Document.id,
             Document.title,
-            Document.content_ams,
-            Document.source,
+            Document.source_url,
             Document.word_count,
             Document.published_at,
-        )
+            DocumentRaw.content,
+        ).join(Document.raw)
     ).all()
 
     # write header
-    cw.writerow(["id", "title", "content", "source_url", "token_count", "published_at"])
+    cw.writerow(["id", "title", "content", "source_url", "word_count", "published_at"])
 
     # print each row
     for row in rows:
@@ -143,9 +160,9 @@ def download():
             [
                 row.id,
                 row.title,
-                row.content_ams,
+                row.content,
                 row.source,
-                row.token_count,
+                row.word_count,
                 row.published_at,
             ]
         )

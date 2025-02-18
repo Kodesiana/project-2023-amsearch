@@ -1,11 +1,11 @@
 import time
 from dataclasses import dataclass
 
-from sqlalchemy import func
 from thefuzz import process
+from sqlalchemy import func, select
 from sentence_transformers import SentenceTransformer
 
-from amsearch.db import db, Document
+from amsearch.db import db, Document, DocumentStem
 from amsearch.stemmer import Stemmer, tokenize
 
 
@@ -30,8 +30,8 @@ class Results:
     has_next: bool
 
 
+LIMIT_DISTANCE = 1.1
 EMPTY_RESULT = Results(0, 0, 0, [], False, False)
-LIMIT_DISTANCE = 1
 
 
 class SearchService:
@@ -43,25 +43,31 @@ class SearchService:
         self, stemmer: str, q: str, page: int = 0, per_page: int = 10
     ) -> Results:
         # perform stemming
-        stemmed, _ = self.stem_sentence(q, stemmer)
+        stemmed = self.stem_sentence(q, stemmer)
 
         # extract embeddings
         embedding = self.model.encode([stemmed])[0]
-        distance_col = Document.embedding_ams.cosine_distance(embedding).label(
+        distance_col = DocumentStem.embedding.cosine_distance(embedding).label(
             "distance"
         )
 
         # build query
         rows_query = (
-            db.select(Document.title, Document.source, Document.content_ams, distance_col)
+            select(
+                DocumentStem.title,
+                DocumentStem.content,
+                distance_col,
+                Document.source_url,
+            )
+            .join(DocumentStem.parent)
             .where(distance_col < LIMIT_DISTANCE)
             .order_by(distance_col)
             .limit(per_page)
             .offset((page - 1) * per_page)
         )
         total_query = (
-            db.select(func.count())
-            .select_from(Document)
+            select(func.count())
+            .select_from(DocumentStem)
             .where(distance_col < LIMIT_DISTANCE)
         )
 
@@ -80,9 +86,9 @@ class SearchService:
             results.append(
                 ResultItem(
                     title=result[0],
-                    url=result[1],
-                    excerpt=self.__truncate_contents(result[2]),
-                    distance=result[3],
+                    excerpt=self.__truncate_contents(result[1]),
+                    distance=result[2],
+                    url=result[3],
                 )
             )
 
@@ -98,32 +104,19 @@ class SearchService:
     def embed(self, text: str):
         return self.model.encode([text])[0]
 
-    def stem_sentence(self, sentence: str, stemmer: str) -> tuple[str, int]:
+    def stem_sentence(self, sentence: str, stemmer: str) -> str:
+        stems = tokenize(sentence)
         if stemmer == "ams":
-            stems = [
-                self.stemmer.stem_ams(word.strip().lower())
-                for word in tokenize(sentence)
-            ]
+            stems = list(map(self.stemmer.stem_ams, stems))
         elif stemmer == "purwoko":
-            stems = [
-                self.stemmer.stem_purwoko(word.strip().lower())
-                for word in tokenize(sentence)
-            ]
+            stems = list(map(self.stemmer.stem_purwoko, stems))
         elif stemmer == "sastrawi":
-            stems = [
-                self.stemmer.stem_sastrawi(word.strip().lower())
-                for word in tokenize(sentence)
-            ]
+            stems = list(map(self.stemmer.stem_sastrawi, stems))
         elif stemmer == "ug18":
-            stems = [
-                self.stemmer.stem_ug18(word.strip().lower())
-                for word in tokenize(sentence)
-            ]
-        else:
-            stems = tokenize(sentence)
+            stems = list(map(self.stemmer.stem_ug18, stems))
 
-        return " ".join(stems), len(stems)
-    
+        return " ".join(stems)
+
     def extract_fuzzy_alternatives(self, *args, **kwargs):
         return process.extract(*args, **kwargs)
 

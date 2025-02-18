@@ -2,6 +2,8 @@ from flask import Blueprint, render_template, redirect, flash, url_for, request
 from flask_login import login_required, login_user, logout_user
 from werkzeug.security import check_password_hash
 
+from sqlalchemy import select
+
 from amsearch.db import db, User
 
 router = Blueprint("auth", __name__)
@@ -17,13 +19,17 @@ def login():
     username = request.form.get("username")
     password = request.form.get("password")
 
-    # find the user by email
-    query = db.select(User).where(User.username == username)
-    user = db.session.execute(query).scalar_one_or_none()
+    # find the user by username
+    user = db.session.execute(
+        select(User).where(User.username == username)
+    ).scalar_one_or_none()
+    if not user:
+        flash("Username atau password salah")
+        return redirect(url_for("auth.login"))
 
     # verify password
-    if not user or not check_password_hash(user.hashed_password, password):
-        flash("Email atau password salah")
+    if not check_password_hash(user.hashed_password, password):
+        flash("Username atau password salah")
         return redirect(url_for("auth.login"))
 
     # login user

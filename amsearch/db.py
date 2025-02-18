@@ -1,36 +1,64 @@
+from datetime import date
+from typing import Optional
+from typing_extensions import Annotated
+
 from flask_login import UserMixin
 from flask_sqlalchemy import SQLAlchemy
 
+from sqlalchemy import String, ForeignKey
+from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column, relationship
 from pgvector.sqlalchemy import Vector
 
-db = SQLAlchemy()
+STR_PK_COL = Annotated[str, mapped_column(primary_key=True)]
+
+
+class Base(DeclarativeBase):
+    pass
+
+
+db = SQLAlchemy(model_class=Base)
 
 
 class User(UserMixin, db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    username = db.Column(db.String(255), unique=True, nullable=False)
-    hashed_password = db.Column(db.String(), unique=False, nullable=False)
-
     __tablename__ = "users"
 
-    def __repr__(self):
-        return f"<User {self.username}  {self.hashed_password}>"
+    id: Mapped[STR_PK_COL]
+    username: Mapped[str] = mapped_column(String, nullable=False, unique=True)
+    hashed_password: Mapped[str]
 
 
 class Document(db.Model):
-    id = db.Column(db.String(256), primary_key=True)
-    title = db.Column(db.String(256), unique=False, nullable=False)
-
-    source = db.Column(db.Text, unique=False, nullable=True)
-    word_count = db.Column(db.Integer, unique=False, nullable=False)
-    published_at = db.Column(db.Date, primary_key=False, nullable=False)
-
-    content_raw = db.Column(db.Text, unique=False, nullable=False)
-    content_ams = db.Column(db.Text, unique=False, nullable=False)
-    embedding_raw = db.Column(Vector(768))
-    embedding_ams = db.Column(Vector(768))
-
     __tablename__ = "documents"
 
-    def __repr__(self):
-        return f"<Document {self.title}>"
+    id: Mapped[STR_PK_COL]
+    title: Mapped[str]
+    word_count: Mapped[int]
+    source_url: Mapped[Optional[str]]
+    published_at: Mapped[date]
+
+    raw: Mapped["DocumentRaw"] = relationship(back_populates="parent")
+    stem: Mapped["DocumentStem"] = relationship(back_populates="parent")
+
+
+class DocumentRaw(db.Model):
+    __tablename__ = "documents_raw"
+
+    id: Mapped[STR_PK_COL]
+    parent_id: Mapped[str] = mapped_column(ForeignKey("documents.id"))
+    parent: Mapped[Document] = relationship(back_populates="raw")
+
+    title: Mapped[str]
+    content: Mapped[str]
+    embedding = mapped_column(Vector(768), nullable=False)
+
+
+class DocumentStem(db.Model):
+    __tablename__ = "documents_stem"
+
+    id: Mapped[STR_PK_COL]
+    parent_id: Mapped[str] = mapped_column(ForeignKey("documents.id"))
+    parent: Mapped[Document] = relationship(back_populates="stem")
+
+    title: Mapped[str]
+    content: Mapped[str]
+    embedding = mapped_column(Vector(768), nullable=False)

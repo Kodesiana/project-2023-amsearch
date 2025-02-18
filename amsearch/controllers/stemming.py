@@ -3,6 +3,7 @@ from dataclasses import dataclass
 from flask import Blueprint, render_template, request
 
 from amsearch.services import IR
+from amsearch.stemmer import tokenize
 
 
 @dataclass
@@ -28,23 +29,15 @@ def stats_description(stem_stats, prefix, total_unique):
 
 @router.route("/stemming", methods=["GET", "POST"])
 def stem():
-    # show page
-    if request.method == "GET":
-        return render_template(
-            "pages/public/stemming.html", input_text="", output_text="", stems=[]
-        )
-
-    # get text
+    # show default page
     input_text = request.form.get("input-text")
-    if not input_text:
+    if request.method == "GET" or not input_text:
         return render_template(
             "pages/public/stemming.html", input_text="", output_text="", stems=[]
         )
 
     # split tokens
-    tokens = set(
-        [word.strip().lower() for word in IR.tokenize(input_text)]
-    )
+    tokens = set(tokenize(input_text))
 
     # perform stemming
     stems: list[StemResult] = [
@@ -83,10 +76,10 @@ def stem():
         # input text
         input_text=input_text,
         # sentence stemming
-        output_ams=IR.stem_sentence(input_text, "ams")[0],
-        output_purwoko=IR.stem_sentence(input_text, "purwoko")[0],
-        output_sastrawi=IR.stem_sentence(input_text, "sastrawi")[0],
-        output_ug18=IR.stem_sentence(input_text, "ug18")[0],
+        output_ams=IR.stem_sentence(input_text, "ams"),
+        output_purwoko=IR.stem_sentence(input_text, "purwoko"),
+        output_sastrawi=IR.stem_sentence(input_text, "sastrawi"),
+        output_ug18=IR.stem_sentence(input_text, "ug18"),
         # per word stems
         stems=stems,
         # statistics

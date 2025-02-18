@@ -80,9 +80,9 @@
         <tr>
           <td>{{ ((pagination.page - 1) * 10) + loop.index }}</td>
           <td class="has-text-weight-semibold">{{ item.title }}</td>
-          <td class="truncate-content">{{ item.content }}</td>
+          <td class="truncate-content">{{ item.raw.content }}</td>
           <td>{{ item.published_at.strftime('%d %b %Y') }}</td>
-          <td class="has-text-centered">{{ item.token_count }}</td>
+          <td class="has-text-centered">{{ item.word_count }}</td>
           <td class="has-text-centered">
             <div class="buttons is-centered">
               <a class="button is-small " href="{{ url_for('admin.update', id=item.id) }}">
