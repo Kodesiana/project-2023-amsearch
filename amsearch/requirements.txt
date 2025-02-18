@@ -10,15 +10,14 @@ pgvector==0.3.6
 psycopg2-binary==2.9.10
 
 # AI/ML
-numpy==2.2.1
-torch==2.5.1
+numpy
+torch==2.6.0
 thefuzz==0.22.1
 pysastrawi==1.2.0
-scikit-learn==1.6.0
-sentence-transformers==3.3.1
+transformers==4.49.0
+sentence-transformers==3.4.1
 
 # Utilities
-joblib==1.4.2
 requests==2.32.3
-setuptools==75.6.0
+setuptools==75.8.0
 python-dotenv==1.0.1

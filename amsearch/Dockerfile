@@ -1,5 +1,5 @@
 # pull base image
-FROM python:3.11-bookworm AS base
+FROM python:3.11-slim-bookworm AS base
 
 # install uv
 COPY --from=ghcr.io/astral-sh/uv:latest /uv /uvx /bin/
@@ -7,17 +7,14 @@ COPY --from=ghcr.io/astral-sh/uv:latest /uv /uvx /bin/
 # set work directory
 WORKDIR /usr/app
 
-# install system dependencies
-RUN apt-get update \
-    && apt-get -y install libpq-dev gcc \
-    && rm -rf /var/lib/apt/lists/*
-
 # install python dependencies
 COPY requirements.txt .
-RUN uv pip install --system --no-cache -r requirements.txt --index-strategy unsafe-best-match --index https://download.pytorch.org/whl/cpu
-
-# create prod image
-FROM base AS prod
+RUN uv pip install \
+    --system \
+    --no-cache \
+    -r requirements.txt \
+    --index-strategy unsafe-best-match \
+    --index https://download.pytorch.org/whl/cpu
 
 # copy project
 COPY . ./amsearch

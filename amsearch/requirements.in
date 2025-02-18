@@ -1,0 +1,23 @@
+# Web App
+flask
+flask-login
+flask-sqlalchemy
+werkzeug
+gunicorn
+
+# Databases
+pgvector
+psycopg2-binary
+
+# AI/ML
+numpy
+torch
+thefuzz
+pysastrawi
+transformers
+sentence-transformers
+
+# Utilities
+joblib
+setuptools
+python-dotenv
