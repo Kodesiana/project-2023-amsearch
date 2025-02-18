@@ -6,10 +6,10 @@ volumes:
 
 services:
   postgres:
-    image: pgvector/pgvector:pg15
+    image: paradedb/paradedb:latest
     cap_add:
       - SYS_NICE
-    # restart: always
+    restart: always
     env_file: postgres.env
     ports:
       - 5432:5432
@@ -17,11 +17,10 @@ services:
       - amsearch
     volumes:
       - postgres:/var/lib/postgresql/data
-      - ./seed:/docker-entrypoint-initdb.d
 
   web:
     build: amsearch
-    # restart: always
+    restart: always
     env_file: web.env
     ports:
       - 8000:8000

@@ -172,7 +172,8 @@ cython_debug/
 data/
 dataset/
 models/
-docker/
+docker/*
+!docker/*.example
 
 # Env
 *.env
