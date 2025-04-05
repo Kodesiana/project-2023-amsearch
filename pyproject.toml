@@ -41,4 +41,6 @@ dependencies = [
     "requests>=2.31.0",
     "ipykernel>=6.29.5",
     "setuptools>=72.2.0",
+    "scienceplots>=2.1.1",
+    "joblib>=1.4.2",
 ]
