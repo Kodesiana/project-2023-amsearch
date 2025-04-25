@@ -1,8 +1,3 @@
-import sys
-import pathlib
-
-sys.path.insert(0, str(pathlib.Path(__file__).parent.parent.resolve()))
-
 import uuid
 import argparse
 from datetime import date
@@ -17,7 +12,7 @@ from pgvector.sqlalchemy import Vector
 
 from sentence_transformers import SentenceTransformer
 
-from amsearch.stemmer import Stemmer, tokenize, word_count
+from stemmer import Stemmer, tokenize, word_count
 
 # ========================================================
 # DATABASE SCHEMAS
@@ -73,14 +68,14 @@ class DocumentStem(Base):
 
 
 def main(args):
+    # create postgres engine
+    engine = create_engine(args.database_url, echo=True)
+
     # create stemmer
     stemmer = Stemmer(args.vocab_path)
 
     # create model
     model = SentenceTransformer(args.model_path)
-
-    # create postgres engine
-    engine = create_engine(args.database_url, echo=True)
 
     # read dataset
     df = pd.read_csv(args.dataset_path)
