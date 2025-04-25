@@ -54,8 +54,11 @@ def stem_corpus(stemmer: Stemmer, item: dict[str, str]):
 
 # https://github.com/beir-cellar/beir/wiki/Evaluate-your-custom-model
 class AMSBaselineModel:
-    def __init__(self, model=None, **kwargs):
-        self.model = model
+    def __init__(self, model_name: str, vocab_path: str, **kwargs):
+        self.model = joblib.load(model_name)
+
+        if "stem" in model_name:
+            self.model.tokenizer = AMSTokenizer(vocab_path)
 
     # Write your own encoding query function (Returns: Query embeddings as numpy array)
     def encode_queries(
@@ -76,12 +79,10 @@ class AMSBaselineModel:
 
 def load_model(args):
     if "tf-idf" in args.model_name or "bow" in args.model_name:
-        model = joblib.load(args.model_name)
-
-        if "stem" in args.model_name:
-            model.tokenizer = AMSTokenizer(args.vocab_path)
-
-        return DenseRetrievalExactSearch(AMSBaselineModel(model), batch_size=16)
+        return DenseRetrievalExactSearch(
+            AMSBaselineModel(args.model_name, args.vocab_path),
+            batch_size=args.batch_size,
+        )
 
     return DenseRetrievalExactSearch(
         SentenceBERT(args.model_name), batch_size=args.batch_size
