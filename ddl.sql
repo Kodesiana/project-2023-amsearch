@@ -6,6 +6,9 @@ CREATE TABLE public.users (
 	CONSTRAINT users_username_unique UNIQUE (username)
 );
 
+INSERT INTO public.users (id, username, hashed_password) VALUES
+('586061c5-8fe9-4e09-bd2c-47fc0ee9be35', 'admin', 'pbkdf2:sha256:600000$ULe3VYZ9Iygan53b$79fd5d79eae25fb9f61c14328eed082d1fe2f48f538c62fc8855babdaf181340');
+
 CREATE TABLE public.documents (
 	id varchar NOT NULL,
 	title varchar NOT NULL,
