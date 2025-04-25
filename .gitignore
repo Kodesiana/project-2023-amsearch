@@ -178,3 +178,6 @@ docker/*
 # Env
 *.env
 CRED
+
+# Temp
+tmp/
