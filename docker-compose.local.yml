@@ -25,7 +25,7 @@ services:
     networks:
       - amsearch
     volumes:
-      - ./models/indobert-ams:/models/indobert-ams
+      - ./models/ams-all-mpnet-base-v2:/models/ams-all-mpnet-base-v2
       - ./models/stemming-vocab.txt:/models/stemming-vocab.txt
     depends_on:
       - postgres
