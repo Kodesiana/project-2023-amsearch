@@ -1,3 +1,6 @@
+#!/usr/bin/env bash
+set -euxo pipefail
+
 # --- eval pretrained models
 python eval.py --model-name sentence-transformers/all-mpnet-base-v2 --dataset-path ../data/beir 
 python eval.py --model-name sentence-transformers/multi-qa-distilbert-cos-v1 --dataset-path ../data/beir 
