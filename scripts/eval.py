@@ -13,6 +13,10 @@ from beir.datasets.data_loader import GenericDataLoader
 from beir.retrieval.evaluation import EvaluateRetrieval
 from beir.retrieval.search.dense import DenseRetrievalExactSearch
 
+from gensim.models.doc2vec import Doc2Vec
+from gensim.models.fasttext import FastText
+from sklearn.feature_extraction.text import CountVectorizer, TfidfVectorizer
+
 from stemmer import Stemmer, AMSTokenizer, tokenize
 
 # ----------------------- HELPERS -----------------------
@@ -36,6 +40,7 @@ def save_results(model_name: str, eval_stemming: bool, items: list[dict[str, flo
 
     safe_model_name = model_name.split("/")[-1]
     safe_model_name = safe_model_name.replace(".joblib", "")
+    safe_model_name = safe_model_name.replace(".gensim", "")
     safe_model_name = (
         f"{safe_model_name}-{datetime.datetime.now().strftime('%Y%m%d-%H%M%S')}.csv"
     )
@@ -53,34 +58,56 @@ def stem_corpus(stemmer: Stemmer, item: dict[str, str]):
 
 
 # https://github.com/beir-cellar/beir/wiki/Evaluate-your-custom-model
-class AMSBaselineModel:
-    def __init__(self, model_name: str, vocab_path: str, **kwargs):
-        self.model = joblib.load(model_name)
+class AMSCustomModelEvaluator:
+    def __init__(self, model_name: str, stemmer: Stemmer = None, **kwargs):
+        self.model_name = model_name
+        self.stemmer = stemmer
 
-        if "stem" in model_name:
-            self.model.tokenizer = AMSTokenizer(vocab_path)
+        if "bow" in model_name or "tfidf" in model_name:
+            self.model = joblib.load(self.model_name)
+            if "stem" in self.model_name:
+                self.model.tokenizer = AMSTokenizer(self.stemmer)
+        elif "doc2vec" in model_name:
+            self.model = Doc2Vec.load(model_name)
+        elif "fasttext" in model_name:
+            self.model = FastText.load(model_name)
+        else:
+            raise ValueError("Invalid model name")
 
-    # Write your own encoding query function (Returns: Query embeddings as numpy array)
     def encode_queries(
         self, queries: list[str], batch_size: int, **kwargs
     ) -> np.ndarray:
-        return self.model.transform(queries).todense().astype(float)
+        if isinstance(self.model, CountVectorizer) or isinstance(
+            self.model, TfidfVectorizer
+        ):
+            return self.model.transform(queries).todense().astype(float)
 
-    # Write your own encoding corpus function (Returns: Document embeddings as numpy array)
+        if isinstance(self.model, Doc2Vec):
+            return np.array(
+                [self.model.infer_vector(tokenize(sentence)) for sentence in queries]
+            ).astype(float)
+
+        if isinstance(self.model, FastText):
+            return np.array(
+                [self.model.wv.get_sentence_vector(sentence) for sentence in queries]
+            ).astype(float)
+
     def encode_corpus(
         self, corpus: list[dict[str, str]], batch_size: int, **kwargs
     ) -> np.ndarray:
         extracted_corpus = [row["title"] + " " + row["text"] for row in corpus]
-        return self.model.transform(extracted_corpus).todense().astype(float)
+        return self.encode_queries(extracted_corpus, batch_size, **kwargs)
 
 
 # ----------------------- ENTRY POINT -----------------------
 
 
 def load_model(args):
-    if "tf-idf" in args.model_name or "bow" in args.model_name:
+    custom_eval_models = ["bow", "tfidf", "doc2vec", "fasttext"]
+    if any(x in args.model_name for x in custom_eval_models):
+        stemmer = Stemmer(args.vocab_path)
         return DenseRetrievalExactSearch(
-            AMSBaselineModel(args.model_name, args.vocab_path),
+            AMSCustomModelEvaluator(args.model_name, stemmer),
             batch_size=args.batch_size,
         )
 

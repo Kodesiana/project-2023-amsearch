@@ -6,6 +6,9 @@ import argparse
 import joblib
 import pandas as pd
 
+from gensim import utils
+from gensim.models.fasttext import FastText
+from gensim.models.doc2vec import Doc2Vec, TaggedDocument
 from torch.utils.data import DataLoader, Dataset
 from sklearn.feature_extraction.text import CountVectorizer, TfidfVectorizer
 from sentence_transformers.losses import MultipleNegativesRankingLoss
@@ -48,6 +51,32 @@ class TripletDataset(Dataset):
         return len(self.dataset)
 
 
+class GensimTripletCorpusLoader:
+    def __init__(self, corpus_path: str, stemmer: Stemmer = None):
+        self.corpus_path = corpus_path
+        self.stemmer = stemmer
+        self.index = 0
+
+    def __iter__(self):
+        df_corpus = pd.read_json(self.corpus_path, lines=True)
+        self.corpus = df_corpus.values.ravel().tolist()
+        self.index = 0
+        self.total = len(self.corpus)
+
+        return self
+
+    def __next__(self):
+        if self.total == self.index:
+            raise StopIteration
+
+        line = self.corpus[self.index]
+        if self.stemmer:
+            line = stem_sentence(self.stemmer, line)
+
+        self.index += 1
+        return utils.simple_preprocess(line)
+
+
 # ----------------------- ENTRY POINT -----------------------
 
 
@@ -87,7 +116,7 @@ def train_bert(args):
     model.save(args.output_path)
 
 
-def train_vsm(args):
+def train_sklearn(args):
     # load dataset
     df_corpus = pd.read_json(args.dataset_path, lines=True)
     train_corpus = df_corpus.values.ravel().tolist()
@@ -98,7 +127,7 @@ def train_vsm(args):
     # fit model
     model = (
         TfidfVectorizer(tokenizer=tokenizer)
-        if "tf-idf" in args.model_name
+        if "tfidf" in args.model_name
         else CountVectorizer(tokenizer=tokenizer)
     )
     model.fit(train_corpus)
@@ -107,9 +136,41 @@ def train_vsm(args):
     joblib.dump(model, args.output_path)
 
 
+def train_gensim(args):
+    # load dataset
+    if args.stemming:
+        stemmer = Stemmer(args.vocab_path)
+        corpus_loader = GensimTripletCorpusLoader(args.dataset_path, stemmer=stemmer)
+    else:
+        corpus_loader = GensimTripletCorpusLoader(args.dataset_path)
+
+    # create model and data
+    if "doc2vec" in args.model_name:
+        train_corpus = [TaggedDocument(x, [i]) for i, x in enumerate(corpus_loader)]
+        gensim_model = Doc2Vec(vector_size=100, min_count=2, epochs=args.epochs)
+    else:
+        train_corpus = list(corpus_loader)
+        gensim_model = FastText(vector_size=100, min_count=2, epochs=args.epochs)
+
+    # build vocab and train
+    gensim_model.build_vocab(train_corpus)
+    gensim_model.train(
+        train_corpus,
+        total_examples=gensim_model.corpus_count,
+        epochs=gensim_model.epochs,
+    )
+
+    # save model
+    gensim_model.save(args.output_path)
+
+
 def main(args):
-    if "tf-idf" in args.model_name or "bow" in args.model_name:
-        train_vsm(args)
+    if "tfidf" in args.model_name or "bow" in args.model_name:
+        train_sklearn(args)
+        return
+
+    if "doc2vec" in args.model_name or "fasttext" in args.model_name:
+        train_gensim(args)
         return
 
     train_bert(args)
