@@ -122,7 +122,7 @@ def train_sklearn(args):
     train_corpus = df_corpus.values.ravel().tolist()
 
     # create tokenizer
-    tokenizer = AMSTokenizer(args.vocab_path) if args.stemming else None
+    tokenizer = AMSTokenizer(Stemmer(args.vocab_path)) if args.stemming else None
 
     # fit model
     model = (

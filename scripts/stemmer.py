@@ -303,8 +303,8 @@ class Stemmer:
 
 
 class AMSTokenizer:
-    def __init__(self, vocab_path: str):
-        self.stemmer = Stemmer(vocab_path)
+    def __init__(self, stemmer: Stemmer):
+        self.stemmer = stemmer
 
     def __call__(self, doc):
         return [self.stemmer.stem_ams(word) for word in tokenize(doc)]
