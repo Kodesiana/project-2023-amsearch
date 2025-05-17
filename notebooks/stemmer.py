@@ -300,3 +300,11 @@ class Stemmer:
                 return __kata__
 
         return original_word
+
+class AMSTokenizer:
+    def __init__(self, stemmer: Stemmer):
+        self.stemmer = stemmer
+
+    def __call__(self, doc):
+        return [self.stemmer.stem_ams(word) for word in tokenize(doc)]
+

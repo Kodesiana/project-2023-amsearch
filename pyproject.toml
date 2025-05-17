@@ -45,4 +45,5 @@ dependencies = [
     "setuptools>=72.2.0",
     "scienceplots>=2.1.1",
     "joblib>=1.4.2",
+    "umap-learn>=0.5.7",
 ]
