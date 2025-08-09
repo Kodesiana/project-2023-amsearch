@@ -60,6 +60,7 @@ class DocumentStem(Base):
 # ENTRY POINT
 # ========================================================
 
+
 def main(args):
     # create postgres engine
     engine = create_engine(args.database_url, echo=True)
@@ -76,14 +77,30 @@ def main(args):
 
         # process each rows
         print("Embedding raw...")
-        embedding_raw = model.encode([row.content for row in documents_raw], show_progress_bar=True)
+        embedding_raw = model.encode(
+            [row.content for row in documents_raw], show_progress_bar=True
+        )
         print("Embedding stem...")
-        embedding_stem = model.encode([row.content for row in documents_stem], show_progress_bar=True)
+        embedding_stem = model.encode(
+            [row.content for row in documents_stem], show_progress_bar=True
+        )
 
         # bulk update
         print("Embedding updating...")
-        session.execute(update(DocumentRaw), [{"id": row.id, "embedding": embedding} for row, embedding in zip(documents_raw, embedding_raw.tolist())] )
-        session.execute(update(DocumentStem), [{"id": row.id, "embedding": embedding} for row, embedding in zip(documents_stem, embedding_stem.tolist())] )
+        session.execute(
+            update(DocumentRaw),
+            [
+                {"id": row.id, "embedding": embedding}
+                for row, embedding in zip(documents_raw, embedding_raw.tolist())
+            ],
+        )
+        session.execute(
+            update(DocumentStem),
+            [
+                {"id": row.id, "embedding": embedding}
+                for row, embedding in zip(documents_stem, embedding_stem.tolist())
+            ],
+        )
 
         # bulk commit
         print("Commiting changes...")
