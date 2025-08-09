@@ -1,0 +1,31 @@
+[project]
+name = "project-2023-amsearch-web"
+version = "0.1.0"
+description = "AMSearch Web"
+requires-python = ">=3.13"
+dependencies = [
+    # Web App
+    "flask==3.1.0",
+    "flask-login==0.6.3",
+    "flask-sqlalchemy==3.1.1",
+    "werkzeug==3.1.3",
+    "gunicorn==23.0.0",
+    # Databases
+    "pgvector==0.3.6",
+    "psycopg2-binary==2.9.10",
+    # AI/ML
+    "numpy==1.26.4",
+    "torch==2.6.0",
+    "thefuzz==0.22.1",
+    "pysastrawi==1.2.0",
+    "transformers==4.49.0",
+    "sentence-transformers==3.4.1",
+    # Utilities
+    "requests==2.32.3",
+    "setuptools==75.8.0",
+    "python-dotenv==1.0.1",
+]
+
+[tool.uv]
+index-strategy = "unsafe-best-match"
+extra-index-url = ["https://download.pytorch.org/whl/cpu"]
