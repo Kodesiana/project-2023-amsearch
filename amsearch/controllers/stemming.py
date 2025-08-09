@@ -4,6 +4,7 @@ from flask import Blueprint, render_template, request
 
 from amsearch.services import IR
 from amsearch.stemmer import tokenize
+from amsearch.localization import i18n
 
 
 @dataclass
@@ -19,7 +20,8 @@ router = Blueprint("stemming", __name__)
 
 
 def stats_description(stem_stats, prefix, total_unique):
-    return "Jumlah kata stemming: {0}\nJumlah kata unik: {1}\nJumlah kata benar: {2}\n Akurasi: {3:.2f}%".format(
+    return i18n.get_message(
+        "stemming-ctr-stats",
         stem_stats[f"stemmed_{prefix}"],
         total_unique,
         stem_stats[f"correct_{prefix}"],

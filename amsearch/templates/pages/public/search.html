@@ -2,7 +2,7 @@
 
 {% block content %}
 <!-- Header -->
-<h1 class="subtitle is-3 has-text-centered">Pencarian</h1>
+<h1 class="subtitle is-3 has-text-centered">{{ _('search-title') }}</h1>
 
 <!-- Search -->
 <div class="columns is-centered">
@@ -23,19 +23,18 @@
       <div class="field has-addons">
         <div class="control is-expanded">
           <input id="search-input" type="text" class="input is-large" name="q" value="{{ keyword }}"
-            placeholder="Masukkan kata kunci" required>
+            placeholder="{{ _('search-input-placeholder') }}" required>
         </div>
         <div class="control">
           <button id="search-button" type="submit" class="button is-large is-dark" disabled>
-            Cari
+            {{ _('search-action-search') }}
           </button>
         </div>
       </div>
 
       <div class="columns">
         <div class="column">
-          <p class="mt-2 mb-4">Ditemukan {{ '{:,}'.format(results.total) }} dokumen. Lama eksekusi
-            {{ execution_time }} detik.</p>
+          <p class="mt-2 mb-4">{{ _('search-result-headline', results.total, execution_time) }}</p>
         </div>
       </div>
     </form>
@@ -66,13 +65,13 @@
     <!-- Pagination -->
     <div class="is-flex is-justify-content-space-between">
       {% if results.has_prev %}
-      <a class="button" href="{{ url_for('search.search', q=keyword, page=results.page-1 ) }}">Prev</a>
+      <a class="button" href="{{ url_for('search.search', q=keyword, page=results.page-1 ) }}">{{ _('search-nav-prev') }}</a>
       {% else %}
       <div class="is-invisible"></div>
       {% endif %}
 
       {% if results.has_next %}
-      <a class="button" href="{{ url_for('search.search', q=keyword, page=results.page+1 ) }}">Next</a>
+      <a class="button" href="{{ url_for('search.search', q=keyword, page=results.page+1 ) }}">{{ _('search-nav-next') }}</a>
       {% endif %}
     </div>
   </div>

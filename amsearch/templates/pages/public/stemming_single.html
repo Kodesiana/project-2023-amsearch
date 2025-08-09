@@ -1,18 +1,18 @@
 {% extends "layouts/default.html" %}
 
 {% block content %}
-<h1 class="subtitle is-2 has-text-centered">Stemming per Kata</h1>
+<h1 class="subtitle is-2 has-text-centered">{{ _('stemming_single-title') }}</h1>
 
 <form id="stemming-form" action="{{ url_for('stemming.stem_word') }}" method="post" class="mb-4">
     <div class="card">
         <div class="card-content">
             <!-- Input Text -->
-            <input id="input-word" name="input-word" class="input" placeholder="Input kata" value="{{ input_word }}">
+            <input id="input-word" name="input-word" class="input" placeholder="{{ _('stemming_single-input-placeholder') }}" value="{{ input_word }}">
 
             <div class="columns is-centered mt-4">
                 <div class="column is-half is-full-mobile">
                     <button id="submit-button" type="submit" class="button is-medium is-dark is-fullwidth" disabled>
-                        <span class="has-text-weight-semibold">Proses Stemming</span>
+                        <span class="has-text-weight-semibold">{{ _('stemming_single-action-stem') }}</span>
                     </button>
                 </div>
             </div>
@@ -23,13 +23,13 @@
 {% if input_word %}
 <div class="card">
     <header class="card-header">
-        <p class="card-header-title">Hasil Stemming AMS</p>
+        <p class="card-header-title">{{ _('stemming_single-result-title') }}</p>
     </header>
     <div class="card-content">
-        <p class="subtitle is-4 has-text-centered">Kata asli: <span class="tag is-info is-large">{{ input_word }}</span></p>
-        <p class="subtitle is-4 has-text-centered">Kata stemming: <span class="tag is-success is-large">{{ stemmed_word }}</span></p>
+        <p class="subtitle is-4 has-text-centered">{{ _('stemming_single-word-original') }} <span class="tag is-info is-large">{{ input_word }}</span></p>
+        <p class="subtitle is-4 has-text-centered">{{ _('stemming_single-word-stem') }} <span class="tag is-success is-large">{{ stemmed_word }}</span></p>
         {% if alternatives %}
-        <p class="subtitle is-4 has-text-centered">Pencarian Anda "{{ stemmed_word }}" tidak ditemukan. Mungkin Anda mencari kata:</p>
+        <p class="subtitle is-4 has-text-centered">{{ _('stemming_single-alternatives', stemmed_word) }}</p>
         <div class="is-flex is-justify-content-center">
             <div class="field is-grouped is-grouped-multiline">
                 {% for word, similarity in alternatives %}

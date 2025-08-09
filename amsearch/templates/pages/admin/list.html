@@ -16,18 +16,18 @@
 
   <!-- Header -->
   <div class="is-flex is-justify-content-space-between is-align-items-center mb-4">
-    <h4 class="subtitle is-3">Dataset</h4>
+    <h4 class="subtitle is-3">{{ _('list-title') }}</h4>
     <div class="columns is-mobile">
       <div class="column is-narrow">
         <!-- Search -->
         <form action="{{ url_for('admin.list') }}" method="get">
           <div class="field has-addons">
             <div class="control is-expanded">
-              <input class="input" type="text" name="q" value="{{ search_term }}" placeholder="Cari judul...">
+              <input class="input" type="text" name="q" value="{{ search_term }}" placeholder="{{ _('list-search-placeholder') }}">
             </div>
             <div class="control">
               <button class="button is-dark">
-                Cari
+                {{ _('list-action-search') }}
               </button>
             </div>
           </div>
@@ -40,14 +40,14 @@
           <span class="icon">
             <i class="fa fa-plus"></i>
           </span>
-          <span>Tambah</span>
+          <span>{{ _('list-action-add') }}</span>
         </a>
         <!-- Download -->
         <a class="button is-link" href="{{ url_for('admin.download') }}">
           <span class="icon">
             <i class="fa fa-download"></i>
           </span>
-          <span>Unduh</span>
+          <span>{{ _('list-action-download') }}</span>
         </a>
       </div>
     </div>
@@ -66,12 +66,12 @@
     <table class="table is-striped is-hoverable is-fullwidth" style="border-radius: var(--bulma-card-radius);">
       <thead>
         <tr>
-          <th>No</th>
-          <th>Judul</th>
-          <th>Isi</th>
-          <th width="15%">Tanggal Terbit</th>
-          <th width="200px" class="has-text-centered">Jumlah Token</th>
-          <th class="has-text-centered">Aksi</th>
+          <th>{{ _('list-table-col-num') }}</th>
+          <th>{{ _('list-table-col-title') }}</th>
+          <th>{{ _('list-table-col-content') }}</th>
+          <th width="15%">{{ _('list-table-col-date') }}</th>
+          <th width="200px" class="has-text-centered">{{ _('list-table-col-tokens') }}</th>
+          <th class="has-text-centered">{{ _('list-table-col-actions') }}</th>
         </tr>
       </thead>
       <tbody>
@@ -101,7 +101,7 @@
         {% endfor %}
         {% else %}
         <tr>
-          <td colspan="6" class="has-text-centered">Tidak ada data yang ditemukan.</td>
+          <td colspan="6" class="has-text-centered">{{ _('list-table-status-nodata') }}</td>
         </tr>
         {% endif %}
       </tbody>
@@ -111,7 +111,7 @@
     <!-- Loading State -->
     {% if loading %}
     <div class="notification is-info has-text-centered">
-      Memuat data...
+      {{ _('list-table-status-loading') }}
     </div>
     {% endif %}
   </div>
@@ -120,17 +120,16 @@
   <nav class="pagination is-centered" role="navigation" aria-label="pagination">
     {% if pagination.has_prev %}
     <a class="pagination-previous"
-      href="{{ url_for('admin.list', q=search_term, page=pagination.prev_num, per_page=pagination.per_page) }}">Previous</a>
+      href="{{ url_for('admin.list', q=search_term, page=pagination.prev_num, per_page=pagination.per_page) }}">{{ _('list-pagination-prev') }}</a>
     {% else %}
-    <a class="pagination-previous" disabled>Previous</a>
+    <a class="pagination-previous" disabled>{{ _('list-pagination-prev') }}</a>
     {% endif %}
 
     {% if pagination.has_next %}
     <a class="pagination-next"
-      href="{{ url_for('admin.list', q=search_term, page=pagination.next_num, per_page=pagination.per_page) }}">Next
-      page</a>
+      href="{{ url_for('admin.list', q=search_term, page=pagination.next_num, per_page=pagination.per_page) }}">{{ _('list-pagination-next') }}</a>
     {% else %}
-    <a class="pagination-next" disabled>Next page</a>
+    <a class="pagination-next" disabled>{{ _('list-pagination-next') }}</a>
     {% endif %}
 
     <ul class="pagination-list">
@@ -152,24 +151,24 @@
       {% endfor %}
     </ul>
   </nav>
-
 </div>
 {% endblock %}
 
 {% block script %}
 {{ super() }}
+
 <script>
   document.addEventListener("DOMContentLoaded", () => {
     (document.querySelectorAll('.delete-button') || []).forEach(button => {
       const id = button.dataset.id;
       button.addEventListener('click', function deleteItem(e) {
         Swal.fire({
-          title: 'Hapus data',
-          text: 'Anda yakin menghapus data?',
+          title: "{{ _('list-modal-delete-title') }}",
+          text: "{{ _('list-modal-delete-text') }}",
           icon: 'question',
           showCancelButton: true,
-          confirmButtonText: 'Hapus',
-          cancelButtonText: 'Batal',
+          confirmButtonText: "{{ _('list-modal-confirm') }}",
+          cancelButtonText: "{{ _('list-modal-cancel') }}",
         }).then(result => {
           if (result.isConfirmed) {
             window.location.href = `/admin/remove/${id}`;

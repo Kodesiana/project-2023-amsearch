@@ -39,7 +39,7 @@
 {% endblock %}
 
 {% block content %}
-<h1 class="subtitle is-2 has-text-centered">Stemming</h1>
+<h1 class="subtitle is-2 has-text-centered">{{ _('stemming-title') }}</h1>
 
 <form id="stemming-form" action="{{ url_for('stemming.stem') }}" method="post" class="mb-4">
   <div class="card">
@@ -55,24 +55,24 @@
               <span class="file-icon">
                 <i class="fas fa-upload"></i>
               </span>
-              <span class="file-label"> Pilih berkas TXT... </span>
+              <span class="file-label"> {{ _('stemming-upload-label') }} </span>
             </span>
-            <span id="input-file-name" class="file-name"> Belum ada file TXT dipilih </span>
+            <span id="input-file-name" class="file-name"> {{ _('stemming-upload-nofile') }} </span>
           </label>
         </div>
 
         <!-- Stem per word -->
-        <a class="button is-info" href="{{ url_for('stemming.stem_word') }}">Stemming per Kata</a>
+        <a class="button is-info" href="{{ url_for('stemming.stem_word') }}">{{ _('stemming-nav-words') }}</a>
       </div>
 
       <!-- Input Text -->
       <textarea id="input-text" name="input-text" class="textarea" rows="10" style="min-height: 200px;"
-        placeholder="Input teks">{{ input_text }}</textarea>
+        placeholder="{{ _('stemming-input-text') }}">{{ input_text }}</textarea>
 
       <div class="columns is-centered mt-4">
         <div class="column is-half is-full-mobile">
           <button id="submit-button" type="submit" class="button is-medium is-dark is-fullwidth" disabled>
-            <span class="has-text-weight-semibold">Proses Stemming</span>
+            <span class="has-text-weight-semibold">{{ _('stemming-action-stem') }}</span>
           </button>
         </div>
       </div>
@@ -87,7 +87,7 @@
   <div class="column is-full-mobile is-half-tablet is-one-quarter-desktop">
     <div class="card">
       <header class="card-header">
-        <p class="card-header-title">Hasil Stemming AMS</p>
+        <p class="card-header-title">{{ _('stemming-result-prefix') }} AMS</p>
       </header>
       <div class="card-content">
         <div class="content">
@@ -99,7 +99,7 @@
   <div class="column is-full-mobile is-half-tablet is-one-quarter-desktop">
     <div class="card">
       <header class="card-header">
-        <p class="card-header-title">Hasil Stemming Purwoko</p>
+        <p class="card-header-title">{{ _('stemming-result-prefix') }} Purwoko</p>
       </header>
       <div class="card-content">
         <div class="content">
@@ -111,7 +111,7 @@
   <div class="column is-full-mobile is-half-tablet is-one-quarter-desktop">
     <div class="card">
       <header class="card-header">
-        <p class="card-header-title">Hasil Stemming Sastrawi</p>
+        <p class="card-header-title">{{ _('stemming-result-prefix') }} Sastrawi</p>
       </header>
       <div class="card-content">
         <div class="content">
@@ -123,7 +123,7 @@
   <div class="column is-full-mobile is-half-tablet is-one-quarter-desktop">
     <div class="card">
       <header class="card-header">
-        <p class="card-header-title">Hasil Stemming UG18</p>
+        <p class="card-header-title">{{ _('stemming-result-prefix') }} UG18</p>
       </header>
       <div class="card-content">
         <div class="content">
@@ -144,7 +144,7 @@
   <table class="table is-striped is-hoverable is-fullwidth mb-2" style="border-radius: var(--bulma-card-radius); max-height: 300px;">
     <thead>
       <tr>
-        <th>Kata/Token</th>
+        <th>{{ _('stemming-table-col-token') }}</th>
         <th>AMS</th>
         <th>Purwoko</th>
         <th>Sastrawi</th>
@@ -164,7 +164,6 @@
     </tbody>
   </table>
 </div>
-
 {% endif %}
 {% endblock %}
 
@@ -198,7 +197,7 @@
         toggleSubmitButton(); // Enable submit button if there's text
       };
       reader.onerror = function (evt) {
-        inputText.value = "Gagal membaca file! Coba file lain.";
+        inputText.value = "{{ _('stemming-file-error') }}";
         toggleSubmitButton(); // Disable submit button on error
       };
     };
@@ -213,17 +212,17 @@
         labels: ['AMS', 'Purwoko', 'Sastrawi', 'UG18'],
         datasets: [
           {
-            label: 'Token di-stemming',
+            label: "{{ _('stemming-chart-stemmed-count') }}",
             data: JSON.parse("{{ stats_stemmed_tokens }}"),
             yAxisID: 'y',
           },
           {
-            label: 'Token benar',
+            label: "{{ _('stemming-chart-correct-count') }}",
             data: JSON.parse("{{ stats_correct_tokens }}"),
             yAxisID: 'y',
           },
           {
-            label: 'Akurasi',
+            label: "{{ _('stemming-chart-accuracy') }}",
             data: JSON.parse("{{ stats_accuracy }}"),
             type: 'line',
             yAxisID: 'y2',
@@ -238,7 +237,7 @@
             position: 'left',
             title: {
               display: true,
-              text: "Jumlah token"
+              text: "{{ _('stemming-token-count') }}"
             },
           },
           y2: {
@@ -246,7 +245,7 @@
             position: 'right',
             title: {
               display: true,
-              text: "Akurasi (%)"
+              text: "{{ _('stemming-chart-accuracy') }}"
             },
             grid: {
               drawOnChartArea: false

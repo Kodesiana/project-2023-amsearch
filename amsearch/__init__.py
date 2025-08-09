@@ -1,8 +1,9 @@
-from flask import Flask, render_template
+from flask import Flask, render_template, redirect, url_for, request
 
 from amsearch.db import db, User
 from amsearch.login import lm
 from amsearch.services import IR
+from amsearch.localization import i18n
 
 # create and configure the app
 app = Flask(__name__)
@@ -13,6 +14,9 @@ db.init_app(app)
 
 # create session manager
 lm.init_app(app)
+
+# initialize localization
+i18n.init_app(app)
 
 
 # Flask-Login user loader
@@ -42,3 +46,14 @@ def home():
 @app.get("/about")
 def about():
     return render_template("pages/public/about.html")
+
+
+@app.get("/toggle-language")
+def toggle_language():
+    if i18n.get_locale() == "id":
+        i18n.set_locale("en")
+    else:
+        i18n.set_locale("id")
+
+    prev_url = request.args.get("to", url_for("home"))
+    return redirect(prev_url)

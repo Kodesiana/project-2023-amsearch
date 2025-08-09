@@ -9,8 +9,9 @@ from flask_login import login_required
 from flask import Blueprint, abort, flash, render_template, redirect, url_for, request
 
 from amsearch.db import db, Document, DocumentRaw, DocumentStem
-from amsearch.services import IR
 from amsearch.stemmer import word_count
+from amsearch.services import IR
+from amsearch.localization import i18n
 
 router = Blueprint("admin", __name__)
 
@@ -66,10 +67,12 @@ def remove(id: str):
         db.session.delete(doc)
         db.session.commit()
 
-        flash(f"Data berhasil dihapus!<br><strong>{doc.title}</strong>", "success")
+        flash(i18n.get_message("list-ctr-delete-failed", doc.title), "success")
     except SQLAlchemyError as e:
+        print(e)
         db.session.rollback()
-        flash(f"Gagal menghapus dokumen: {str(e)}", "danger")
+        flash(i18n.get_message("list-ctr-delete-failed"), "danger")
+
     return redirect(url_for("admin.list"))
 
 
@@ -118,14 +121,12 @@ def save():
         db.session.commit()
 
         # redirect to admin page
-        flash(f"Data berhasil ditambahkan!<br><strong>{doc.title}</strong>", "success")
+        flash(i18n.get_message("admin-ctr-insert-success", doc.title), "success")
         return redirect(url_for("admin.list"))
-    except SQLAlchemyError as e:
+    except Exception as e:
         print(e)
         db.session.rollback()
-        flash(f"Data gagal disimpan!<br>Pastikan semua kolom sudah diisi.", "danger")
-    except Exception as e:
-        flash(f"Kesalahan tidak diketahui: {str(e)}", "danger")
+        flash(i18n.get_message("admin-ctr-insert-failed"), "danger")
 
     return render_template("pages/admin/edit.html", **form_data)
 

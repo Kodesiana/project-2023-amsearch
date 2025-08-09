@@ -28,7 +28,7 @@ def search():
             "pages/public/search.html",
             stemmer=stemmer,
             keyword="",
-            execution_time="0.0",
+            execution_time=0.0,
             results=EMPTY_RESULT,
         )
 
@@ -43,6 +43,6 @@ def search():
         "pages/public/search.html",
         stemmer=stemmer,
         keyword=q,
-        execution_time=f"{results.execution_time:.2f}",
+        execution_time=results.execution_time,
         results=results,
     )

@@ -28,9 +28,9 @@
           <div class="card-content">
             <h4 class="subtitle is-4 has-text-centered mb-5">
               {% if id %}
-              Ubah Data
+              {{ _('edit-update-title') }}
               {% else %}
-              Tambah Data
+              {{ _('edit-insert-title') }}
               {% endif %}
             </h4>
 
@@ -51,21 +51,21 @@
               {% endif %}
 
               <div class="field">
-                <label class="label has-text-black is-required">Judul</label>
+                <label class="label has-text-black is-required">{{ _('edit-input-title') }}</label>
                 <div class="control">
                   <input class="input" type="text" name="title" value="{{ title }}" required>
                 </div>
               </div>
 
               <div class="field">
-                <label class="label has-text-black is-required">Isi</label>
+                <label class="label has-text-black is-required">{{ _('edit-input-content') }}</label>
                 <div class="control">
                   <textarea class="textarea" name="content" rows="6" required>{{ content }}</textarea>
                 </div>
               </div>
 
               <div class="field">
-                <label class="label has-text-black is-required">URL</label>
+                <label class="label has-text-black is-required">{{ _('edit-input-url') }}</label>
                 <div class="control has-icons-left">
                   <input class="input" name="source_url" value="{{ source_url }}" required>
                   <span class="icon is-small is-left">
@@ -75,7 +75,7 @@
               </div>
 
               <div class="field">
-                <label class="label has-text-black is-required">Tanggal</label>
+                <label class="label has-text-black is-required">{{ _('edit-input-date') }}</label>
                 <div class="control has-icons-left">
                   <input class="input" type="date" name="published_at" value="{{ published_at }}" required>
                   <span class="icon is-small is-left">
@@ -86,10 +86,10 @@
 
               <div class="field is-grouped is-grouped-right mt-5">
                 <div class="control">
-                  <a href="{{ url_for('admin.list') }}" class="button is-light">Batal</a>
+                  <a href="{{ url_for('admin.list') }}" class="button is-light">{{ _('edit-action-cancel') }}</a>
                 </div>
                 <div class="control">
-                  <button type="submit" class="button is-primary">Simpan</button>
+                  <button type="submit" class="button is-primary">{{ _('edit-action-save') }}</button>
                 </div>
               </div>
             </form>
@@ -103,6 +103,7 @@
 
 {% block script %}
 {{ super() }}
+
 <script>
   document.addEventListener('DOMContentLoaded', () => {
     // Set default date to today

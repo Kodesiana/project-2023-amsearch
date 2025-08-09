@@ -1,7 +1,6 @@
 {% extends "layouts/default.html" %}
 
 {% block content %}
-
 <div class="columns is-centered mb-6">
     <img src="/static/logo-stylized.png">
 </div>
@@ -12,7 +11,7 @@
             <span class="icon is-small">
                 <i class="fa fa-seedling"></i>
             </span>
-            <span class="has-text-weight-semibold">Stemming</span>
+            <span class="has-text-weight-semibold">{{ _('home-action-stemming') }}</span>
         </a>
     </div> #}
 
@@ -21,9 +20,8 @@
             <span class="icon is-small">
                 <i class="fa fa-magnifying-glass"></i>
             </span>
-            <span class="has-text-weight-semibold">Pencarian</span>
+            <span class="has-text-weight-semibold">{{ _('home-action-search') }}</span>
         </a>
     </div>
 </div>
-
 {% endblock %}
