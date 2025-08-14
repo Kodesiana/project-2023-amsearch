@@ -1,0 +1,62 @@
+{% extends "layouts/default.html" %}
+
+{% block content %}
+<!-- Header Section -->
+<section class="section has-text-centered">
+  <div class="container">
+    <figure class="image is-inline-block">
+      <img src="/static/credits.png" style="max-height: 30rem;" alt="Pembuat Aplikasi AMSearch">
+    </figure>
+    <h2 class="subtitle is-4 mt-4 has-text-weight-bold">
+      Tentang AMSearch
+      <span class="icon has-text-success">
+        <i class="fa-solid fa-globe"></i>
+      </span>
+
+      <span class="icon has-text-info">
+        <i class="fa-solid fa-magnifying-glass"></i>
+      </span>
+    </h2>
+  </div>
+</section>
+
+<!-- Introduction Section -->
+<section class="section">
+  <div class="container">
+    <div class="columns is-centered">
+      <div class="column is-12-mobile is-10-tablet is-8-desktop">
+        <p class="is-size-5 has-text-justified">
+          <strong>AMSearch</strong> adalah prototipe aplikasi berbasis website yang dikembangkan sebagai sistem
+          <em>search engine</em> untuk dokumen teks dalam Bahasa Sunda. <strong>AMSearch</strong> mendukung pencarian semantik dan analisis morfologis kata dalam Bahasa Sunda dengan pendekatan berbasis aturan dan representasi vektor dokumen.
+        </p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Features Section -->
+<section class="section">
+  <div class="container">
+    <div class="columns is-centered">
+      <div class="content column is-12-mobile is-10-tablet is-8-desktop">
+        <h3 class="title is-4 has-text-weight-semibold has-text-black mb-4">Fitur Utama AMSearch</h3>
+
+        <h4 class="title is-5 has-text-weight-semibold has-text-black mb-4">Pencarian Dokumen (IR System)</h4>
+        <ul class="is-medium has-text-justified mt-0">
+          <li>Menggunakan model embedding <strong>Transformer</strong> (BERT-based).</li>
+          <li>Pencarian berdasarkan kueri dalam Bahasa Sunda.</li>
+          <li>Menampilkan hasil dokumen relevan dari dataset Bahasa Sunda.</li>
+        </ul>
+
+        <h4 class="title is-5 has-text-weight-semibold has-text-black mb-4 mt-6">Kontribusi Inovatif</h4>
+        <ul class="is-medium has-text-justified mt-0">
+          <li>Algoritma <em>stemming</em> baru untuk Bahasa Sunda.</li>
+          <li>Dataset IR khusus Bahasa Sunda yang jarang tersedia (AMSunda Dataset).</li>
+          <li>Website AMSearch sebagai bukti konsep (proof-of-concept) sistem IR lokal berbasis transformer.</li>
+          <li>Upaya pelestarian dan digitalisasi Bahasa Sunda melalui NLP dan IR.</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+{% endblock %}

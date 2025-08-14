@@ -45,7 +45,11 @@ def home():
 
 @app.get("/about")
 def about():
-    return render_template("pages/public/about.html")
+    if i18n.get_locale() == "id":
+        return render_template("pages/public/about_id.html")
+    
+    return render_template("pages/public/about_en.html")
+    
 
 
 @app.get("/toggle-language")

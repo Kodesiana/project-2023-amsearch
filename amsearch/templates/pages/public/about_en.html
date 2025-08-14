@@ -1,0 +1,61 @@
+{% extends "layouts/default.html" %}
+
+{% block content %}
+<!-- Header Section -->
+<section class="section has-text-centered">
+  <div class="container">
+    <figure class="image is-inline-block">
+      <img src="/static/credits.png" style="max-height: 30rem;" alt="Pembuat Aplikasi AMSearch">
+    </figure>
+    <h2 class="subtitle is-4 mt-4 has-text-weight-bold">
+      About AMSearch
+      <span class="icon has-text-success">
+        <i class="fa-solid fa-globe"></i>
+      </span>
+
+      <span class="icon has-text-info">
+        <i class="fa-solid fa-magnifying-glass"></i>
+      </span>
+    </h2>
+  </div>
+</section>
+
+<!-- Introduction Section -->
+<section class="section">
+  <div class="container">
+    <div class="columns is-centered">
+      <div class="column is-12-mobile is-10-tablet is-8-desktop">
+        <p class="is-size-5 has-text-justified">
+          <strong>AMSearch</strong> is a web-based application prototype developed as a search engine system for text documents in the Sundanese language. <strong>AMSearch</strong> supports semantic search and morphological word analysis in Sundanese using a rule-based approach and document vector representation.
+        </p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Features Section -->
+<section class="section">
+  <div class="container">
+    <div class="columns is-centered">
+      <div class="content column is-12-mobile is-10-tablet is-8-desktop">
+        <h3 class="title is-4 has-text-weight-semibold has-text-black mb-4">Key Features of AMSearch</h3>
+
+        <h4 class="title is-5 has-text-weight-semibold has-text-black mb-4">Document Search (IR System)</h4>
+        <ul class="is-medium has-text-justified mt-0">
+          <li>Uses a <strong>Transformer</strong> embedding model (BERT-based).</li>
+          <li>Search based on queries in Sundanese.</li>
+          <li>Displays relevant document results from the Sundanese dataset.</li>
+        </ul>
+
+        <h4 class="title is-5 has-text-weight-semibold has-text-black mb-4 mt-6">Innovative Contributions</h4>
+        <ul class="is-medium has-text-justified mt-0">
+          <li>A new stemming algorithm for Sundanese.</li>
+          <li>A specialized IR dataset for Sundanese, which is rarely available (AMSunda Dataset).</li>
+          <li>AMSearch website as a proof-of-concept for a local transformer-based IR system.</li>
+          <li>Efforts to preserve and digitize the Sundanese language through NLP and IR.</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+{% endblock %}
